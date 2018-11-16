@@ -4,7 +4,7 @@
  *      *** Do not modify ! ***
  *
  * Project: 'embedded-final-project' 
- * Target:  'src' 
+ * Target:  'NXP_LPC4088' 
  */
 
 #ifndef RTE_COMPONENTS_H
