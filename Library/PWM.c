@@ -2,31 +2,36 @@
 
 void PWM_Init() {
 	//Change the function of the pin in here:
+	IOCON_MOTOR1_SPEED |= 3;
+	IOCON_MOTOR2_SPEED |= 3;
 	
 	PCONP |= 1 << 5;
 	
-	//Enable PWM output for corresponding pin.
+	PORT0->SET = (1 << 9 | 1 << 7);
+	PORT0->CLR = (1 << 8 | 1 << 6);
 	
-	//Reset The PWM Timer Counter and The PWM Prescale Counter on the Next Positive Edge of PCLK
+	PWM0->PCR |= (1 << 9 | 1 << 10);
+	
+	PWM0->TCR = (1 << 1);
 	
 	PWM0->MR0 = (PERIPHERAL_CLOCK_FREQUENCY / 1000000) * 20 * 1000;
 	
 	//Reset TC, when MR0 matches TC.
+	PWM0->MCR = 1 << 1;
 	
 	//Enable PWM Match 0 Latch.
+	PWM0->LER |= 1 << 0;
 	
 	//Enable Counter and PWM and Clear Reset on the PWM
+	PWM0->TCR |= (1 <<0 | 1 << 3);
+	PWM0->TCR &= ~(1 << 1);
 	
-	PWM_Write(0);
+	PWM_MOTOR_Write(0, 0);
+	PWM_MOTOR_Write(0, 1);
 }
 
-void PWM_Cycle_Rate(uint32_t period_In_Cycles) {
-	PWM0->MR0 = (PERIPHERAL_CLOCK_FREQUENCY / 1000000) * period_In_Cycles * 1000;
-	
-	//Enable PWM Match 0 Latch.
-}
 
-void PWM_Write(uint32_t T_ON) {	
+void PWM_MOTOR_Write(uint32_t T_ON, uint32_t MOTOR_TYPE) {	
 	if(T_ON > 100) {
 		T_ON = 100;
 	}
@@ -36,7 +41,12 @@ void PWM_Write(uint32_t T_ON) {
 	if (T_ON == PWM0->MR0) {
 		T_ON++;
 	}
-	PWM0->MR2 = T_ON;
 	
-	//Enable PWM Match Register Latch.
+	if (MOTOR_TYPE == 0) {
+		PWM0->MR1 = T_ON;
+	} else if (MOTOR_TYPE == 1) {
+		PWM0->MR2 = T_ON;
+	}
+	
+	PWM0->LER |= (1 << (MOTOR_TYPE + 1));
 }

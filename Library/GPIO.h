@@ -3,6 +3,8 @@
 
 #include "LPC407x_8x_177x_8x.h"
 
+#include "SystemStructures.h"
+
 //Correctly define GPIO_TypeDef struct.
 typedef struct
 {
@@ -41,6 +43,7 @@ typedef enum {
 #define PORT4_BASE		(GPIO_ADDRESS + 0x080)
 #define PORT5_BASE		(GPIO_ADDRESS + 0x0A0)
 
+void GPIO_Init(void);
 void GPIO_DIR_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value);
 void GPIO_PIN_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value);
 uint32_t GPIO_PIN_Read(GPIO_TypeDef* PORT,uint32_t MASK);

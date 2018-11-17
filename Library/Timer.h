@@ -3,6 +3,8 @@
 
 #include "LPC407x_8x_177x_8x.h"
 #include "SystemStructures.h"
+#include "Parameters.h"
+#include "LED.h"
 
 typedef struct {
   volatile	uint32_t IR;
@@ -33,5 +35,9 @@ typedef struct {
 #define TIMER1	((TIMER_TypeDef*) TIMER1_BASE)
 #define TIMER2	((TIMER_TypeDef*) TIMER2_BASE)
 #define TIMER3	((TIMER_TypeDef*) TIMER3_BASE)
+
+void Timer_Init(void);
+void TIMER2_Start(void);
+void TIMER2_Stop(void);
 
 #endif
