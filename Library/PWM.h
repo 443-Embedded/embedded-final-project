@@ -4,6 +4,7 @@
 #include "LPC407x_8x_177x_8x.h"
 
 #include "SystemStructures.h"
+#include "GPIO.h"
 
 typedef struct
 {
@@ -32,9 +33,11 @@ typedef struct
   volatile	uint32_t CTCR;
 } PWM_TypeDef;
 
-//0x00000000 is a dummy value, write the correct address
-#define IOCON_MOTOR_SPEED_ADDRESS	0x00000000
-#define IOCON_MOTOR_SPEED	*((volatile uint32_t*)(IOCON_MOTOR_SPEED_ADDRESS))
+#define IOCON_MOTOR1_SPEED_ADDRESS	0x4002C088
+#define IOCON_MOTOR1_SPEED	*((volatile uint32_t*)(IOCON_MOTOR1_SPEED_ADDRESS))
+	
+#define IOCON_MOTOR2_SPEED_ADDRESS	0x4002C08C
+#define IOCON_MOTOR2_SPEED	*((volatile uint32_t*)(IOCON_MOTOR2_SPEED_ADDRESS))
 
 #define PWM0_BASE	0x40014000
 #define PWM1_BASE	0x40018000
@@ -43,7 +46,6 @@ typedef struct
 #define PWM1	((PWM_TypeDef*) PWM1_BASE)
 
 void PWM_Init(void);
-void PWM_Cycle_Rate(uint32_t period_In_Cycles);
-void PWM_Write(uint32_t T_ON);
+void PWM_MOTOR_Write(uint32_t T_ON, uint32_t MOTOR_TYPE);
 
 #endif
