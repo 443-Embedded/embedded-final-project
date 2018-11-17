@@ -1,8 +1,5 @@
 #include "Timer.h"
 
-uint32_t TURNING_RIGHT = 0;
-uint32_t TURNING_LEFT = 0;
-
 void Timer_Init() {
 	//Enable Timer2
 	PCONP |= (1 << 22);
@@ -55,20 +52,20 @@ void TIMER2_Stop() {
 	//Stop Timer2 Counter 
 	TIMER2->TCR &= ~(1 << 0);
 	
-	TURNING_LEFT = 0;
-	TURNING_RIGHT = 0;
+	TURN_LEFT_FLAG = 0;
+	TURN_RIGHT_FLAG = 0;
 }
 
 void TIMER2_IRQHandler() {
-	if(TURNING_LEFT != 0) {
-		TURNING_LEFT++;
-		LED_Change(0, TURNING_LEFT & 1);
-		LED_Change(2, TURNING_LEFT & 1);
+	if(TURN_LEFT_FLAG != 0) {
+		TURN_LEFT_FLAG++;
+		LED_Change(0, TURN_LEFT_FLAG & 1);
+		LED_Change(2, TURN_LEFT_FLAG & 1);
 	}
-	if(TURNING_RIGHT != 0) {
-		TURNING_RIGHT++;
-		LED_Change(1, TURNING_RIGHT & 1);
-		LED_Change(3, TURNING_RIGHT & 1);
+	if(TURN_RIGHT_FLAG != 0) {
+		TURN_RIGHT_FLAG++;
+		LED_Change(1, TURN_RIGHT_FLAG & 1);
+		LED_Change(3, TURN_RIGHT_FLAG & 1);
 	}
 	
 	//Clear the interrupt flag for Mat channel 1 event

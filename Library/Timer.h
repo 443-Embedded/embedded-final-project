@@ -36,8 +36,6 @@ typedef struct {
 #define TIMER2	((TIMER_TypeDef*) TIMER2_BASE)
 #define TIMER3	((TIMER_TypeDef*) TIMER3_BASE)
 
-extern uint32_t TURNING_LEFT, TURNING_RIGHT;
-
 void Timer_Init(void);
 void TIMER2_Start(void);
 void TIMER2_Stop(void);

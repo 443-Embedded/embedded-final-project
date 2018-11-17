@@ -82,7 +82,6 @@ void update() {
 	} else if (Joystick_Right_Pressed()) {
 		TURN_LEFT_FLAG = BACKWARD_FLAG = FORWARD_FLAG = 0;
 		TURN_RIGHT_FLAG = 1;
-		TURNING_RIGHT = 1;
 		PWM_MOTOR_Write(ROBOT_SPEED, 0);
 		PWM_MOTOR_Write(ROBOT_SPEED, 1);
 		MOTOR_DIR(0, BACKWARD);
@@ -91,7 +90,6 @@ void update() {
 	} else if (Joystick_Left_Pressed()) {
 		TURN_RIGHT_FLAG = BACKWARD_FLAG = FORWARD_FLAG = 0;
 		TURN_LEFT_FLAG = 1;
-		TURNING_LEFT = 1;
 		PWM_MOTOR_Write(ROBOT_SPEED, 0);
 		PWM_MOTOR_Write(ROBOT_SPEED, 1);
 		MOTOR_DIR(0, FORWARD);
