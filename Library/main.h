@@ -19,6 +19,6 @@ typedef enum {
 	RIGHT_BLINKER, LEFT_BLINKER, FORWARD_LED, BACKWARD_LED, STOP_LED
 } LED_State;
 
-void MOTOR_DIR(uint32_t MOTOR_TYPE, Motor_State state);
+void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state);
 void LED_Adjuster(LED_State state);
 #endif

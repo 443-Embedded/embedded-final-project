@@ -23,7 +23,7 @@ void LED_Adjuster(LED_State state) {
 	}
 }
 
-void MOTOR_DIR(uint32_t MOTOR_TYPE, Motor_State state) {
+void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state) {
 	if (state == FORWARD){
 		PORT0->SET = (1 << MOTOR_PINS[MOTOR_TYPE][0]);
 		PORT0->CLR = (1 << MOTOR_PINS[MOTOR_TYPE][1]);

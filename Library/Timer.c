@@ -92,8 +92,8 @@ void TIMER3_IRQHandler() {
 
 void TIMER2_IRQHandler() {
 	LED_Adjuster(STOP_LED);
-	MOTOR_DIR(0, STOP);
-	MOTOR_DIR(1, STOP);
+	MOTOR_Direction(0, STOP);
+	MOTOR_Direction(1, STOP);
 	
 	//Clear the interrupt flag for MAT channel 0 event
 	TIMER2->IR = (1 << 0);
