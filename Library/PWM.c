@@ -7,9 +7,6 @@ void PWM_Init() {
 	
 	PCONP |= 1 << 5;
 	
-	PORT0->SET = (1 << 9 | 1 << 7);
-	PORT0->CLR = (1 << 8 | 1 << 6);
-	
 	PWM0->PCR |= (1 << 9 | 1 << 10);
 	
 	PWM0->TCR = (1 << 1);
@@ -23,7 +20,7 @@ void PWM_Init() {
 	PWM0->LER |= 1 << 0;
 	
 	//Enable Counter and PWM and Clear Reset on the PWM
-	PWM0->TCR |= (1 <<0 | 1 << 3);
+	PWM0->TCR |= (1 << 0 | 1 << 3);
 	PWM0->TCR &= ~(1 << 1);
 	
 	PWM_MOTOR_Write(0, 0);

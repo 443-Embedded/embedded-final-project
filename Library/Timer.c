@@ -91,17 +91,10 @@ void TIMER3_IRQHandler() {
 }
 
 void TIMER2_IRQHandler() {
-	TIMER3_Stop();
-	LED_Change(0, 0);
-	LED_Change(1, 0);
-	LED_Change(2, 0);
-	LED_Change(3, 0);
-	PORT0->SET = (1 << 9);
-	PORT0->SET = (1 << 8);
-	PORT0->SET = (1 << 7);
-	PORT0->SET = (1 << 6);
+	LED_Adjuster(STOP_LED);
+	MOTOR_DIR(0, STOP);
+	MOTOR_DIR(1, STOP);
 	
-	NVIC_ClearPendingIRQ(TIMER2_IRQn);
 	//Clear the interrupt flag for MAT channel 0 event
 	TIMER2->IR = (1 << 0);
 }

@@ -5,6 +5,7 @@
 #include "SystemStructures.h"
 #include "Parameters.h"
 #include "LED.h"
+#include "main.h"
 
 typedef struct {
   volatile	uint32_t IR;
