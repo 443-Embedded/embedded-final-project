@@ -2,7 +2,6 @@
 
 void init() {
 	GPIO_Init();
-	Joystick_Init();
 	PWM_Init();
 	LED_Init();
 	Timer_Init();
@@ -36,13 +35,7 @@ void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state) {
 	} 
 }
 
-void update() {	
-	uint32_t l = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_LEFT_MASK);
-		uint32_t r = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_RIGHT_MASK);
-
-		uint32_t u = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_UP_MASK);
-
-		uint32_t d = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_DOWN_MASK);
+void update() {
 	if (Joystick_Center_Pressed()) {
 		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = BACKWARD_FLAG = 0;
 		PWM_MOTOR_Write(0, 0);
@@ -87,6 +80,7 @@ void update() {
 
 int main() {
 	init();
+	wait(1000);
 	while(1) {
 		update();
 	}

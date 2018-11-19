@@ -44,9 +44,22 @@ typedef enum {
 #define PORT4_BASE		(GPIO_ADDRESS + 0x080)
 #define PORT5_BASE		(GPIO_ADDRESS + 0x0A0)
 
+#define IOCON_LEFT_ADDR	0x4002C280
+#define IOCON_LEFT	*((volatile uint32_t*)(IOCON_LEFT_ADDR))
+
+#define IOCON_DOWN_ADDR	0x4002C284
+#define IOCON_DOWN	*((volatile uint32_t*)(IOCON_DOWN_ADDR))
+
+#define IOCON_UP_ADDR	0x4002C288
+#define IOCON_UP	*((volatile uint32_t*)(IOCON_UP_ADDR))
+	
+#define IOCON_CENTER_ADDR	0x4002C28C
+#define IOCON_CENTER	*((volatile uint32_t*)(IOCON_CENTER_ADDR))
+	
+#define IOCON_RIGHT_ADDR 0x4002C290
+#define IOCON_RIGHT	*((volatile uint32_t*)(IOCON_RIGHT_ADDR))
+
 void GPIO_Init(void);
-void GPIO_DIR_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value);
-void GPIO_PIN_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value);
 uint32_t GPIO_PIN_Read(GPIO_TypeDef* PORT,uint32_t MASK);
 
 #endif
