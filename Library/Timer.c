@@ -91,6 +91,7 @@ void TIMER3_IRQHandler() {
 }
 
 void TIMER2_IRQHandler() {
+	TIMER3_Stop();
 	LED_Change(0, 0);
 	LED_Change(1, 0);
 	LED_Change(2, 0);
@@ -103,5 +104,4 @@ void TIMER2_IRQHandler() {
 	NVIC_ClearPendingIRQ(TIMER2_IRQn);
 	//Clear the interrupt flag for MAT channel 0 event
 	TIMER2->IR = (1 << 0);
-	TIMER3_Stop();
 }
