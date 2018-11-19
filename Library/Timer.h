@@ -36,7 +36,13 @@ typedef struct {
 #define TIMER2	((TIMER_TypeDef*) TIMER2_BASE)
 #define TIMER3	((TIMER_TypeDef*) TIMER3_BASE)
 
+#define IOCON_TIMER2_CAP1_ADDRESS 0x4002C014
+#define IOCON_TIMER2_CAP1 *((volatile uint32_t*)(IOCON_TIMER2_CAP1_ADDRESS))
+
 void Timer_Init(void);
+void TIMER3_Start(void);
+void TIMER3_Stop(void);
+
 void TIMER2_Start(void);
 void TIMER2_Stop(void);
 
