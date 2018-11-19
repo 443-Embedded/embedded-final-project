@@ -387,11 +387,6 @@
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
             </File>
-            <File>
-              <FileName>main.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\main.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -428,14 +423,14 @@
               <FilePath>.\Library\PWM.c</FilePath>
             </File>
             <File>
-              <FileName>Parameters.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Library\Parameters.h</FilePath>
-            </File>
-            <File>
               <FileName>Parameters.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Library\Parameters.c</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Library\main.h</FilePath>
             </File>
           </Files>
         </Group>
