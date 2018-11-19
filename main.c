@@ -1,25 +1,4 @@
-#include "LPC407x_8x_177x_8x.h"
-
-#include "Library/GPIO.h"
-#include "Library/Timer.h"
-#include "Library/PWM.h"
-#include "Library/Joystick.h"
-#include "Library/LED.h"
-#include "Library/Wait.h"
-#include "Library/Parameters.h"
-
-uint32_t TURN_LEFT_FLAG = 0;
-uint32_t TURN_RIGHT_FLAG = 0;
-uint32_t FORWARD_FLAG = 0;
-uint32_t BACKWARD_FLAG = 0;
-
-typedef enum {
-	STOP,	FORWARD, BACKWARD
-} Motor_State;
-
-typedef enum {
-	RIGHT_BLINKER, LEFT_BLINKER, FORWARD_LED, BACKWARD_LED, STOP_LED
-} LED_State;
+#include "main.h"
 
 void init() {
 	GPIO_Init();
