@@ -23,8 +23,8 @@ typedef enum {
 
 void init() {
 	GPIO_Init();
-	PWM_Init();
 	Joystick_Init();
+	PWM_Init();
 	LED_Init();
 	Timer_Init();
 }
@@ -36,8 +36,10 @@ void LED_Adjuster(LED_State state) {
 	LED_Change(3, (state == BACKWARD_LED) | (state == RIGHT_BLINKER));
 	
 	if (state == LEFT_BLINKER | state == RIGHT_BLINKER) {
+		TIMER3_Start();
 		TIMER2_Start();
 	} else {
+		TIMER3_Stop();
 		TIMER2_Stop();
 	}
 }
@@ -56,6 +58,12 @@ void MOTOR_DIR(uint32_t MOTOR_TYPE, Motor_State state) {
 }
 
 void update() {	
+	uint32_t l = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_LEFT_MASK);
+		uint32_t r = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_RIGHT_MASK);
+
+		uint32_t u = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_UP_MASK);
+
+		uint32_t d = GPIO_PIN_Read(JOYSTICK_PORT,JOYSTICK_DOWN_MASK);
 	if (Joystick_Center_Pressed()) {
 		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = BACKWARD_FLAG = 0;
 		PWM_MOTOR_Write(0, 0);

@@ -1,10 +1,11 @@
 #include "Joystick.h"
 
 void Joystick_Init() {
-	IOCON_DOWN = IOCON_RIGHT = IOCON_LEFT = IOCON_CENTER = IOCON_UP = 0;
-
-	// Did not solve the initial left problem.
-	PORT5->SET = (1 << 0 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4);
+	IOCON_DOWN &= ~(7);
+	IOCON_RIGHT &= ~(7);
+	IOCON_LEFT &= ~(7);
+	IOCON_CENTER &= ~(7);
+	IOCON_UP &= ~(7);
 }
 
 uint8_t Joystick_Left_Pressed(void) {

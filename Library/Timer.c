@@ -1,42 +1,63 @@
 #include "Timer.h"
 
 void Timer_Init() {
-	//Enable Timer2
-	PCONP |= (1 << 22);
+	//Enable Timer2 and Timer3
+	PCONP |= (1 << 22 | 1 << 23);
+	IOCON_TIMER2_CAP1 |= 3;
 	
-	//Change the mode of Timer2 to Timer Mode.
-	TIMER2->CTCR = 0x00;
+	//Change the mode of Timer3 to Timer Mode.
+	TIMER3->CTCR = 0x00;
 	
-	//Change the mode of Timer3 to Counter Mode.
-	TIMER0->CTCR = 0x01;
-	TIMER1->CTCR = 0x01;
+	//Change the mode of Timer2 to Counter Mode.
+	TIMER2->CTCR = 0x05;
+	
+	TIMER2->CCR &= ~(1 << 0 | 1 << 1 | 1 << 2);
 	
 	//Disable Timer Counter and Prescale Counter for Timer0-1 and Timer2.
+	TIMER3->TCR &= ~(1 << 0);
 	TIMER2->TCR &= ~(1 << 0);
-	TIMER0->TCR &= ~(1 << 0);
-	TIMER1->TCR &= ~(1 << 0);
 	
 	//Reset Timer Counter and Prescale Counter for Timer2 and Timer0-1.
+	TIMER3->TCR |= (1 << 1);
 	TIMER2->TCR |= (1 << 1);
-	TIMER0->TCR |= (1 << 1);
-	TIMER1->TCR |= (1 << 1);
 	
 	//Change PR Register value for 1 microsecond incrementing
-	TIMER2->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000 - 1;
-	TIMER0->PR = 0;
-	TIMER1->PR = 0;
+	TIMER3->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000 - 1;
 	
-	TIMER2->MR0 = 250;
-	TIMER2->MCR |= 3;
+	TIMER3->MR0 = 250;
+	TIMER3->MCR |= 3;
 	
-	//Clear pendings for Timer2.
+	TIMER2->MR0 = ROTATION_NUMBER_FOR_90_DEGREE * 6;
+	TIMER2->MCR |= 7;
+	
+	//Clear pendings for Timer3 and Timer2.
+	NVIC_ClearPendingIRQ(TIMER3_IRQn);
 	NVIC_ClearPendingIRQ(TIMER2_IRQn);
 	
-	//Set Priority Timer2 IRQ as 5.
-	NVIC_SetPriority(TIMER2_IRQn,5);
+	//Set Priority Timer3 and Timer2 IRQ as 5.
+	NVIC_SetPriority(TIMER3_IRQn, 5);
+	NVIC_SetPriority(TIMER2_IRQn, 5);
 	
-	//Enable TIMER2_IRQn (Interrupt Request).
+	//Enable TIMER3_IRQn  and TIMER2_IRQn (Interrupt Request).
+	NVIC_EnableIRQ(TIMER3_IRQn);
 	NVIC_EnableIRQ(TIMER2_IRQn);
+}
+
+void TIMER3_Start() {
+	//Remove the reset on counters of Timer3.
+	TIMER3->TCR |= (1 << 1);
+	
+	//Enable Timer3 Counter and Prescale Counter for counting.
+	TIMER3->TCR &= ~(1 << 1);
+	TIMER3->TCR |= (1 << 0);	
+}
+
+void TIMER3_Stop() {
+	//Stop Timer3 Counter 
+	TIMER3->TCR &= ~(1 << 0);
+	
+	TURN_LEFT_FLAG = 0;
+	TURN_RIGHT_FLAG = 0;
 }
 
 void TIMER2_Start() {
@@ -51,12 +72,9 @@ void TIMER2_Start() {
 void TIMER2_Stop() {
 	//Stop Timer2 Counter 
 	TIMER2->TCR &= ~(1 << 0);
-	
-	TURN_LEFT_FLAG = 0;
-	TURN_RIGHT_FLAG = 0;
 }
 
-void TIMER2_IRQHandler() {
+void TIMER3_IRQHandler() {
 	if(TURN_LEFT_FLAG != 0) {
 		TURN_LEFT_FLAG++;
 		LED_Change(0, TURN_LEFT_FLAG & 1);
@@ -68,6 +86,22 @@ void TIMER2_IRQHandler() {
 		LED_Change(3, TURN_RIGHT_FLAG & 1);
 	}
 	
-	//Clear the interrupt flag for Mat channel 1 event
+	//Clear the interrupt flag for MAT channel 0 event
+	TIMER3->IR = (1 << 0);
+}
+
+void TIMER2_IRQHandler() {
+	TIMER3_Stop();
+	LED_Change(0, 0);
+	LED_Change(1, 0);
+	LED_Change(2, 0);
+	LED_Change(3, 0);
+	PORT0->SET = (1 << 9);
+	PORT0->SET = (1 << 8);
+	PORT0->SET = (1 << 7);
+	PORT0->SET = (1 << 6);
+	
+	NVIC_ClearPendingIRQ(TIMER2_IRQn);
+	//Clear the interrupt flag for MAT channel 0 event
 	TIMER2->IR = (1 << 0);
 }
