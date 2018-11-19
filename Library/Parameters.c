@@ -6,3 +6,5 @@ const uint32_t ROBOT_SPEED = 60;
 const uint32_t ROTATION_NUMBER_FOR_90_DEGREE = 100;
 
 const uint32_t MOTOR_PINS[2][2] = {{9, 8}, {1, 0}};
+
+const uint32_t LED_PINS[4] = {23, 24, 25, 26};
