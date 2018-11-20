@@ -1,5 +1,6 @@
 #include "Library/main.h"
 
+// Initialize GPIO, PWM, LEDs, and Timers.
 void init() {
 	GPIO_Init();
 	PWM_Init();
@@ -7,11 +8,14 @@ void init() {
 	Timer_Init();
 }
 
+/*
+* Changes states of all LEDs and in the case of turning left or right starts the corresponding timers.
+*/
 void LED_Adjuster(LED_State state) {
-	LED_Change(0, (state == FORWARD_LED) | (state == LEFT_BLINKER));
-	LED_Change(1, (state == FORWARD_LED) | (state == RIGHT_BLINKER));
-	LED_Change(2, (state == BACKWARD_LED) | (state == LEFT_BLINKER));
-	LED_Change(3, (state == BACKWARD_LED) | (state == RIGHT_BLINKER));
+	LED_Change(0, (state == FORWARD_LED) || (state == LEFT_BLINKER));
+	LED_Change(1, (state == FORWARD_LED) || (state == RIGHT_BLINKER));
+	LED_Change(2, (state == BACKWARD_LED) || (state == LEFT_BLINKER));
+	LED_Change(3, (state == BACKWARD_LED) || (state == RIGHT_BLINKER));
 	
 	if (state == LEFT_BLINKER | state == RIGHT_BLINKER) {
 		TIMER3_Start();
@@ -22,6 +26,7 @@ void LED_Adjuster(LED_State state) {
 	}
 }
 
+// Sets the direction of given motor type
 void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state) {
 	if (state == BACKWARD){
 		PORT0->SET = (1 << MOTOR_PINS[MOTOR_TYPE][0]);
@@ -35,6 +40,13 @@ void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state) {
 	} 
 }
 
+/*
+* When Joystick Left button is pressed, starts to rotate 90 degree in counter-clockwise direction.
+* When Joystick Up button is pressed, starts to travel in forward direction.
+* When Joystick Down button is pressed, starts to travel in backward direction.
+* When Joystick Center button is pressed, stops.
+* When Joystick Right button is pressed, starts to rotate 90 degree in clockwise direction.
+*/
 void update() {
 	if (Joystick_Center_Pressed()) {
 		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = BACKWARD_FLAG = 0;
@@ -79,9 +91,9 @@ void update() {
 }
 
 int main() {
-	init();
-	wait(1000);
-	while(1) {
+	init();		// Initializes everything
+	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
+	while(1) {	// Event loop
 		update();
 	}
 }
