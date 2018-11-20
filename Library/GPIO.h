@@ -9,12 +9,12 @@
 //Correctly define GPIO_TypeDef struct.
 typedef struct
 {
-  volatile	uint32_t DIR;
-						uint32_t RESERVED0[3];
-  volatile	uint32_t MASK;
-  volatile	uint32_t PIN;
-  volatile	uint32_t SET;
-  volatile  uint32_t CLR;
+  volatile uint32_t 	DIR;
+  uint32_t 		RESERVED0[3];
+  volatile uint32_t 	MASK;
+  volatile uint32_t 	PIN;
+  volatile uint32_t 	SET;
+  volatile uint32_t 	CLR;
 } GPIO_TypeDef;
 
 typedef enum {
@@ -37,12 +37,12 @@ typedef enum {
 #define PORT4	((GPIO_TypeDef*) PORT4_BASE)
 #define PORT5	((GPIO_TypeDef*) PORT5_BASE)
 
-#define PORT0_BASE		(GPIO_ADDRESS + 0x000)
-#define PORT1_BASE		(GPIO_ADDRESS + 0x020)
-#define PORT2_BASE		(GPIO_ADDRESS + 0x040)
-#define PORT3_BASE		(GPIO_ADDRESS + 0x060)
-#define PORT4_BASE		(GPIO_ADDRESS + 0x080)
-#define PORT5_BASE		(GPIO_ADDRESS + 0x0A0)
+#define PORT0_BASE	(GPIO_ADDRESS + 0x000)
+#define PORT1_BASE	(GPIO_ADDRESS + 0x020)
+#define PORT2_BASE	(GPIO_ADDRESS + 0x040)
+#define PORT3_BASE	(GPIO_ADDRESS + 0x060)
+#define PORT4_BASE	(GPIO_ADDRESS + 0x080)
+#define PORT5_BASE	(GPIO_ADDRESS + 0x0A0)
 
 #define IOCON_LEFT_ADDR	0x4002C280
 #define IOCON_LEFT	*((volatile uint32_t*)(IOCON_LEFT_ADDR))
