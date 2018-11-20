@@ -23,10 +23,10 @@ void LED_Adjuster(LED_State state) {
 }
 
 void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state) {
-	if (state == FORWARD){
+	if (state == BACKWARD){
 		PORT0->SET = (1 << MOTOR_PINS[MOTOR_TYPE][0]);
 		PORT0->CLR = (1 << MOTOR_PINS[MOTOR_TYPE][1]);
-	} else if (state == BACKWARD){
+	} else if (state == FORWARD){
 		PORT0->CLR = (1 << MOTOR_PINS[MOTOR_TYPE][0]);
 		PORT0->SET = (1 << MOTOR_PINS[MOTOR_TYPE][1]);
 	} else if (state == STOP) {
@@ -64,16 +64,16 @@ void update() {
 		TURN_RIGHT_FLAG = 1;
 		PWM_MOTOR_Write(ROBOT_SPEED, 0);
 		PWM_MOTOR_Write(ROBOT_SPEED, 1);
-		MOTOR_Direction(0, BACKWARD);
-		MOTOR_Direction(1, FORWARD);
+		MOTOR_Direction(1, BACKWARD);
+		MOTOR_Direction(0, FORWARD);
 		LED_Adjuster(RIGHT_BLINKER);
 	} else if (Joystick_Left_Pressed()) {
 		TURN_RIGHT_FLAG = BACKWARD_FLAG = FORWARD_FLAG = 0;
 		TURN_LEFT_FLAG = 1;
 		PWM_MOTOR_Write(ROBOT_SPEED, 0);
 		PWM_MOTOR_Write(ROBOT_SPEED, 1);
-		MOTOR_Direction(0, FORWARD);
-		MOTOR_Direction(1, BACKWARD);
+		MOTOR_Direction(1, FORWARD);
+		MOTOR_Direction(0, BACKWARD);
 		LED_Adjuster(LEFT_BLINKER);
 	}
 }
