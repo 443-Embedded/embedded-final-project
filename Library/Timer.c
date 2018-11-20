@@ -20,7 +20,7 @@ void Timer_Init() {
 	TIMER2->TCR |= (1 << 1);
 	
 	//Change the mode of Timer2 to Timer Mode.
-	TIMER2->CTCR = 0x00ş
+	TIMER2->CTCR = 0x00;
 	
 	// TIMER 3
 	//Change the mode of Timer3 to Timer Mode.
