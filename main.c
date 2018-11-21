@@ -17,7 +17,7 @@ void LED_Adjuster(LED_State state) {
 	LED_Change(2, (state == BACKWARD_LED) || (state == LEFT_BLINKER));
 	LED_Change(3, (state == BACKWARD_LED) || (state == RIGHT_BLINKER));
 	
-	if (state == LEFT_BLINKER | state == RIGHT_BLINKER) {
+	if (state == LEFT_BLINKER || state == RIGHT_BLINKER) {
 		TIMER3_Start();
 		TIMER2_Start();
 	} else {
