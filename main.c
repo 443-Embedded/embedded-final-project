@@ -93,7 +93,7 @@ void update() {
 int main() {
 	init();		// Initializes everything
 	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
-	while(1) {	// Event loop
+	while(1) {	
 		update();
 	}
 }
