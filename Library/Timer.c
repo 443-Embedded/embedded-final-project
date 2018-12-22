@@ -1,8 +1,37 @@
 #include "Timer.h"
 
-void Timer_Init() {
-	//Enable Timer2 and Timer3
-	PCONP |= (1 << 22 | 1 << 23);
+void Timer1_Init() {
+	// TIMER 1
+	//Change the mode of Timer1 to Timer Mode.
+	TIMER1->CTCR = 0x00;
+	
+	//Disable Timer Counter and Prescale Counter for Timer1.
+	TIMER1->TCR &= ~(1 << 0);
+	
+	//Reset Timer Counter and Prescale Counter for Timer1.
+	TIMER1->TCR |= (1 << 1);
+	
+	//Change PR Register value for 1 microsecond incrementing
+	TIMER1->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000 - 1;
+	
+	//Set MR0 to 250 in order to blink LED in every 250ms.
+	TIMER1->MR0 = 250;
+	//After match occurs, interrupt on MR0 and reset MR0
+	TIMER1->MCR |= 3;
+	
+	//Clear pendings for Timer1.
+	NVIC_ClearPendingIRQ(TIMER1_IRQn);
+	
+	//Set Priority Timer1 IRQ as 5.
+	NVIC_SetPriority(TIMER1_IRQn, 5);
+	
+	//Enable TIMER1_IRQn (Interrupt Request).
+	NVIC_EnableIRQ(TIMER1_IRQn);
+}
+
+void Timer2_Init() {
+	//Enable Timer2
+	PCONP |= (1 << 22);
 	
 	// TIMER 2
 	//Set the function of P0_5 to T2_CAP1 
@@ -22,14 +51,26 @@ void Timer_Init() {
 	//Change the mode of Timer2 to Timer Mode.
 	TIMER2->CTCR = 0x00;
 	
+	//Clear pendings for Timer2
+	NVIC_ClearPendingIRQ(TIMER2_IRQn);
+	
+	//Set Priority Timer2 IRQ as 5.
+	NVIC_SetPriority(TIMER2_IRQn, 5);
+	
+	//Enable TIMER2_IRQn (Interrupt Request).
+	NVIC_EnableIRQ(TIMER2_IRQn);
+}
+
+void Timer3_Init() {
+	PCONP |= (1 << 23);
 	// TIMER 3
 	//Change the mode of Timer3 to Timer Mode.
 	TIMER3->CTCR = 0x00;
 	
-	//Disable Timer Counter and Prescale Counter for Timer2 and Timer3.
+	//Disable Timer Counter and Prescale Counter for Timer3.
 	TIMER3->TCR &= ~(1 << 0);
 	
-	//Reset Timer Counter and Prescale Counter for Timer2 and Timer3.
+	//Reset Timer Counter and Prescale Counter for Timer3.
 	TIMER3->TCR |= (1 << 1);
 	
 	//Change PR Register value for 1 microsecond incrementing
@@ -40,33 +81,30 @@ void Timer_Init() {
 	//After match occurs, interrupt on MR0 and reset MR0
 	TIMER3->MCR |= 3;
 	
-	//Clear pendings for Timer2 and Timer3.
+	//Clear pendings for Timer3.
 	NVIC_ClearPendingIRQ(TIMER3_IRQn);
-	NVIC_ClearPendingIRQ(TIMER2_IRQn);
 	
-	//Set Priority Timer2 and Timer3 IRQ as 5.
+	//Set Priority Timer3 IRQ as 5.
 	NVIC_SetPriority(TIMER3_IRQn, 5);
-	NVIC_SetPriority(TIMER2_IRQn, 5);
 	
-	//Enable TIMER2_IRQn  and TIMER3_IRQn (Interrupt Request).
+	//Enable TIMER3_IRQn (Interrupt Request).
 	NVIC_EnableIRQ(TIMER3_IRQn);
-	NVIC_EnableIRQ(TIMER2_IRQn);
 }
 
-// Starts timer3 for LEDs
-void TIMER3_Start() {
-	//Reset Timer Counter and Prescale Counter for Timer3.
-	TIMER3->TCR |= (1 << 1);
+// Starts timer1 for LEDs
+void TIMER1_Start() {
+	//Reset Timer Counter and Prescale Counter for Timer1.
+	TIMER1->TCR |= (1 << 1);
 	
-	// Enable Counter and remove reset on Timer3.
-	TIMER3->TCR |= (1 << 0);
-	TIMER3->TCR &= ~(1 << 1);
+	// Enable Counter and remove reset on Timer1.
+	TIMER1->TCR |= (1 << 0);
+	TIMER1->TCR &= ~(1 << 1);
 }
 
-// Stops timer3 for LEDs
-void TIMER3_Stop() {
+// Stops timer1 for LEDs
+void TIMER1_Stop() {
 	//Disable counter for timer3
-	TIMER3->TCR &= ~(1 << 0);
+	TIMER1->TCR &= ~(1 << 0);
 	
 	//Flag for direction of rotation, if it is not 0 then rotation is in that way.
 	TURN_LEFT_FLAG = 0;
@@ -77,7 +115,7 @@ void TIMER3_Stop() {
 * Every 250 ms, this handler will be called. Either rotation is left or right, we increment flag by 1 at each call.
 * Then, we call corresponding LEDs and blink occurs.
 */
-void TIMER3_IRQHandler() {
+void TIMER1_IRQHandler() {
 	if(TURN_LEFT_FLAG != 0) {	
 		TURN_LEFT_FLAG++;	
 		LED_Change(0, TURN_LEFT_FLAG & 1);
@@ -90,7 +128,7 @@ void TIMER3_IRQHandler() {
 	}
 	
 	//Clear the interrupt flag for MAT channel 0 event
-	TIMER3->IR = (1 << 0);
+	TIMER1->IR = (1 << 0);
 }
 
 // Keeps the number of holes detected on wheels by speed sensor.

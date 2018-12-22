@@ -5,7 +5,9 @@ void init() {
 	GPIO_Init();
 	PWM_Init();
 	LED_Init();
-	Timer_Init();
+	Timer1_Init();
+	Timer2_Init();
+	//Timer_Init();
 }
 
 /*
@@ -18,10 +20,10 @@ void LED_Adjuster(LED_State state) {
 	LED_Change(3, (state == BACKWARD_LED) || (state == RIGHT_BLINKER));
 	
 	if (state == LEFT_BLINKER || state == RIGHT_BLINKER) {
-		TIMER3_Start();
+		TIMER1_Start();
 		TIMER2_Start();
 	} else {
-		TIMER3_Stop();
+		TIMER1_Stop();
 		TIMER2_Stop();
 	}
 }
@@ -93,7 +95,7 @@ void update() {
 int main() {
 	init();		// Initializes everything
 	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
-	while(1) {	
+	while(1) {	// Event loop
 		update();
 	}
 }
