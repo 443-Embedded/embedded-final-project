@@ -432,6 +432,16 @@
               <FileType>5</FileType>
               <FilePath>.\Library\main.h</FilePath>
             </File>
+            <File>
+              <FileName>ADC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Library\ADC.c</FilePath>
+            </File>
+            <File>
+              <FileName>External.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Library\External.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

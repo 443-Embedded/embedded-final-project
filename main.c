@@ -5,9 +5,15 @@ void init() {
 	GPIO_Init();
 	PWM_Init();
 	LED_Init();
+	
+	External_Init();
+	
 	Timer1_Init();
 	Timer2_Init();
-	//Timer_Init();
+	Timer3_Init();
+	
+	ADC_Init();
+	TIMER2_Start();
 }
 
 /*
@@ -21,10 +27,8 @@ void LED_Adjuster(LED_State state) {
 	
 	if (state == LEFT_BLINKER || state == RIGHT_BLINKER) {
 		TIMER1_Start();
-		TIMER2_Start();
 	} else {
 		TIMER1_Stop();
-		TIMER2_Stop();
 	}
 }
 
@@ -49,7 +53,7 @@ void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state) {
 * When Joystick Center button is pressed, stops.
 * When Joystick Right button is pressed, starts to rotate 90 degree in clockwise direction.
 */
-void update() {
+void update() {	
 	if (Joystick_Center_Pressed()) {
 		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = BACKWARD_FLAG = 0;
 		MOTOR_Direction(0, STOP);
@@ -62,32 +66,24 @@ void update() {
 		FORWARD_FLAG = 1;
 		MOTOR_Direction(0, FORWARD);
 		MOTOR_Direction(1, FORWARD);
-		PWM_MOTOR_Write(ROBOT_SPEED, 0);
-		PWM_MOTOR_Write(ROBOT_SPEED, 1);
 		LED_Adjuster(FORWARD_LED);
 	} else if (Joystick_Down_Pressed()) {
 		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = 0;
 		BACKWARD_FLAG = 1;
 		MOTOR_Direction(0, BACKWARD);
 		MOTOR_Direction(1, BACKWARD);
-		PWM_MOTOR_Write(ROBOT_SPEED, 0);
-		PWM_MOTOR_Write(ROBOT_SPEED, 1);
 		LED_Adjuster(BACKWARD_LED);
 	} else if (Joystick_Right_Pressed()) {
 		TURN_LEFT_FLAG = BACKWARD_FLAG = FORWARD_FLAG = 0;
 		TURN_RIGHT_FLAG = 1;
 		MOTOR_Direction(1, BACKWARD);
 		MOTOR_Direction(0, FORWARD);
-		PWM_MOTOR_Write(ROBOT_SPEED, 0);
-		PWM_MOTOR_Write(ROBOT_SPEED, 1);
 		LED_Adjuster(RIGHT_BLINKER);
 	} else if (Joystick_Left_Pressed()) {
 		TURN_RIGHT_FLAG = BACKWARD_FLAG = FORWARD_FLAG = 0;
 		TURN_LEFT_FLAG = 1;
 		MOTOR_Direction(1, FORWARD);
 		MOTOR_Direction(0, BACKWARD);
-		PWM_MOTOR_Write(ROBOT_SPEED, 0);
-		PWM_MOTOR_Write(ROBOT_SPEED, 1);
 		LED_Adjuster(LEFT_BLINKER);
 	}
 }
@@ -96,6 +92,21 @@ int main() {
 	init();		// Initializes everything
 	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
 	while(1) {	// Event loop
-		update();
+		ADC_Start();
+		switch(START_MODE) {
+		case AUTO:
+			MOTOR_Direction(1, STOP);
+			MOTOR_Direction(0, STOP);
+			LED_Adjuster(STOP_LED);
+			break;
+		case MANUAL:
+			update();
+			break;
+		default:
+			MOTOR_Direction(1, STOP);
+			MOTOR_Direction(0, STOP);
+			LED_Adjuster(STOP_LED);
+			break;
+		}
 	}
 }
