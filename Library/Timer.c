@@ -24,11 +24,24 @@ void Timer0_Init() {
 }
 
 void Timer0_Start() {
-	//Disable Timer Counter and Prescale Counter
-	TIMER0->TCR &= ~(1 << 0);
-	
 	//Reset Timer Counter and Prescale Counter
 	TIMER0->TCR |= (1 << 1);
+	
+	//Enable Timer Counter and Prescale Counter
+	TIMER0->TCR &= (1 << 0);
+	
+	//Clear reset of timer and prescale counter
+	TIMER0->TCR &= ~(1 << 1);
+}
+
+/*
+* Every 10 ms, this handler will be called.
+*/
+void TIMER0_IRQHandler() {
+	
+	
+	//Clear the interrupt flag for MAT channel 0 event
+	TIMER1->IR = (1 << 0);
 }
 
 void Timer1_Init() {
