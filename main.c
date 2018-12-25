@@ -92,10 +92,7 @@ int main() {
 	init();		// Initializes everything
 	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
 	while(1) {	// Event loop
-		ROBOT_SPEED = ADC_Read();
-		PWM_MOTOR_Write(ROBOT_SPEED, 0);
-		PWM_MOTOR_Write(ROBOT_SPEED, 1);
-		
+		ADC_Start();
 		switch(START_MODE) {
 		case AUTO:
 			MOTOR_Direction(1, STOP);
