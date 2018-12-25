@@ -8,11 +8,13 @@ void init() {
 	
 	External_Init();
 	
+	Timer0_Init();
 	Timer1_Init();
 	Timer2_Init();
 	Timer3_Init();
 	
 	ADC_Init();
+	Timer0_Start();
 	TIMER2_Start();
 }
 
@@ -94,19 +96,19 @@ int main() {
 	while(1) {	// Event loop
 		ADC_Start();
 		switch(START_MODE) {
-		case AUTO:
-			MOTOR_Direction(1, STOP);
-			MOTOR_Direction(0, STOP);
-			LED_Adjuster(STOP_LED);
-			break;
-		case MANUAL:
-			update();
-			break;
-		default:
-			MOTOR_Direction(1, STOP);
-			MOTOR_Direction(0, STOP);
-			LED_Adjuster(STOP_LED);
-			break;
+			case AUTO:
+				MOTOR_Direction(1, STOP);
+				MOTOR_Direction(0, STOP);
+				LED_Adjuster(STOP_LED);
+				break;
+			case MANUAL:
+				update();
+				break;
+			default:
+				MOTOR_Direction(1, STOP);
+				MOTOR_Direction(0, STOP);
+				LED_Adjuster(STOP_LED);
+				break;
 		}
 	}
 }

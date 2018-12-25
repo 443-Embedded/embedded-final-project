@@ -9,7 +9,7 @@
 typedef struct {
   volatile	uint32_t CR;
   volatile	uint32_t GDR;
-						uint32_t RESERVED0;
+			uint32_t RESERVED0;
   volatile	uint32_t INTEN;
   volatile	uint32_t DR[8];
   volatile	uint32_t STAT;
@@ -35,15 +35,17 @@ typedef struct {
 #define ADC_CLKDIV 0x3B
 
 //Write the max value of ADC.
-#define ADC_MAX_VALUE 0xFFF
+#define ADC_MAX 0xFFF
 
-#define ADC_TRIM_POT 0xFE8
+#define ADC_TRIMPOT_MAX 0xFE8
+#define ADC_TRIMPOT_MIN 0x000
+
+#define LDR_WEIGHT 30
 
 #define ADC_BASE	0x40034000
 #define ADC	((ADC_TypeDef*) ADC_BASE)
 
 void ADC_Init(void);
 void ADC_Start(void);
-void ADC_Stop(void);
 
 #endif

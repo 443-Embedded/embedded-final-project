@@ -1,9 +1,5 @@
 #include "ADC.h"
 
-uint32_t ADC_TRIMPOT;
-uint32_t ADC_RIGHT_LDR;
-uint32_t ADC_LEFT_LDR;
-
 void ADC_Init() {
 	//Change the function value of pin to ADC.
 	TRIM_POT_PIN_IOCON |= 1;
@@ -47,6 +43,29 @@ void ADC_Start() {
 	ADC->CR |= (1 << 24);
 }
 
+uint32_t ADC_TRIMPOT;
+uint32_t ADC_RIGHT_LDR;
+uint32_t ADC_LEFT_LDR;
+
+void set_speed() {
+	ROBOT_SPEED = 100 * (ADC_TRIMPOT - ADC_TRIMPOT_MIN) / (ADC_TRIMPOT_MAX - ADC_TRIMPOT_MIN);
+	if(FORWARD_FLAG) {
+		uint32_t leftSpeed = ROBOT_SPEED - LDR_WEIGHT * ADC_LEFT_LDR / ADC_MAX;
+		uint32_t rightSpeed = ROBOT_SPEED - LDR_WEIGHT * ADC_RIGHT_LDR / ADC_MAX;
+		uint32_t inc = ROBOT_SPEED - (leftSpeed + rightSpeed) / 2;
+		if(leftSpeed + inc > 100) {
+			rightSpeed += 100 - leftSpeed;
+			leftSpeed = 100;
+		}
+		else if(rightSpeed + inc > 100) {
+			leftSpeed += 100 - rightSpeed;
+			rightSpeed = 100;
+		}
+		PWM_MOTOR_Write(rightSpeed, 0);	
+ 		PWM_MOTOR_Write(leftSpeed, 1);
+	}
+}
+
 void ADC_IRQHandler() {
 	uint32_t val;
 	if ((val = ADC->DR[0]) >> 31) {
@@ -66,5 +85,7 @@ void ADC_IRQHandler() {
 		ADC->CR &= ~(1 << 3);
 		ADC->CR |= (1 << 0);
 		ADC->CR |= ~(1 << 24);
+
+		set_speed();
 	}
 }

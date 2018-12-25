@@ -5,6 +5,7 @@
 #include "SystemStructures.h"
 #include "Parameters.h"
 #include "LED.h"
+#include "ADC.h"
 #include "main.h"
 
 typedef struct {
@@ -50,6 +51,10 @@ typedef struct {
 //Write IOCON Register Address of Echo Pin.
 #define IOCON_ECHO_ADDRESS	0x4002C060 //P0.24
 #define IOCON_ECHO	*((volatile uint32_t*)(IOCON_ECHO_ADDRESS))
+
+void Timer0_Init();
+void Timer0_Start();
+void Timer0_Stop();
 
 void Timer1_Init(void);
 void Timer2_Init(void);
