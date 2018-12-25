@@ -1,7 +1,37 @@
 #include "Timer.h"
 
+void Timer0_Init() {
+	//Change the mode to Timer Mode.
+	TIMER0->CTCR = 0x00;
+	
+	//Change PR Register value for 1 millisecond incrementing
+	TIMER0->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000 - 1;
+	
+	//Set MR0 to 10.
+	TIMER0->MR0 = 10;
+	
+	//After match occurs, interrupt on MR0 and reset MR0
+	TIMER0->MCR |= 3;
+	
+	//Clear pendings
+	NVIC_ClearPendingIRQ(TIMER0_IRQn);
+	
+	//Set Priority to 5.
+	NVIC_SetPriority(TIMER0_IRQn, 5);
+	
+	//Enable Interrupts.
+	NVIC_EnableIRQ(TIMER0_IRQn);
+}
+
+void Timer0_Start() {
+	//Disable Timer Counter and Prescale Counter
+	TIMER0->TCR &= ~(1 << 0);
+	
+	//Reset Timer Counter and Prescale Counter
+	TIMER0->TCR |= (1 << 1);
+}
+
 void Timer1_Init() {
-	// TIMER 1
 	//Change the mode of Timer1 to Timer Mode.
 	TIMER1->CTCR = 0x00;
 	
@@ -11,7 +41,7 @@ void Timer1_Init() {
 	//Reset Timer Counter and Prescale Counter for Timer1.
 	TIMER1->TCR |= (1 << 1);
 	
-	//Change PR Register value for 1 microsecond incrementing
+	//Change PR Register value for 1 millisecond incrementing
 	TIMER1->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000 - 1;
 	
 	//Set MR0 to 250 in order to blink LED in every 250ms.
