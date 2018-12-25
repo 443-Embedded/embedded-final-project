@@ -7,7 +7,10 @@ void init() {
 	LED_Init();
 	Timer1_Init();
 	Timer2_Init();
-	//Timer_Init();
+	Timer3_Init();
+	
+	ADC_Init();
+	TIMER2_Start();
 }
 
 /*
@@ -21,10 +24,8 @@ void LED_Adjuster(LED_State state) {
 	
 	if (state == LEFT_BLINKER || state == RIGHT_BLINKER) {
 		TIMER1_Start();
-		TIMER2_Start();
 	} else {
 		TIMER1_Stop();
-		TIMER2_Stop();
 	}
 }
 
@@ -50,6 +51,10 @@ void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state) {
 * When Joystick Right button is pressed, starts to rotate 90 degree in clockwise direction.
 */
 void update() {
+	ROBOT_SPEED = ADC_Read();
+	PWM_MOTOR_Write(ROBOT_SPEED, 0);
+	PWM_MOTOR_Write(ROBOT_SPEED, 1);
+	
 	if (Joystick_Center_Pressed()) {
 		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = BACKWARD_FLAG = 0;
 		MOTOR_Direction(0, STOP);

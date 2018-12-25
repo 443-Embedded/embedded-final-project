@@ -3,7 +3,7 @@
 
 #include "LPC407x_8x_177x_8x.h"
 
-extern const uint32_t ROBOT_SPEED;
+extern uint32_t ROBOT_SPEED;
 extern const uint32_t HOLE_NUMBER_FOR_90_DEGREE;
 
 extern uint8_t START_MODE;

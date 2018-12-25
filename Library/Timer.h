@@ -42,6 +42,14 @@ typedef struct {
 
 #define IOCON_TIMER2_CAP0_ADDRESS 0x4002C010
 #define IOCON_TIMER2_CAP0 *((volatile uint32_t*)(IOCON_TIMER2_CAP0_ADDRESS))
+	
+//Write IOCON Register Address of Trigger Pin.
+#define IOCON_TRIGGER_ADDRESS	0x4002C01C //P0.7
+#define IOCON_TRIGGER	*((volatile uint32_t*)(IOCON_TRIGGER_ADDRESS))
+
+//Write IOCON Register Address of Echo Pin.
+#define IOCON_ECHO_ADDRESS	0x4002C060 //P0.24
+#define IOCON_ECHO	*((volatile uint32_t*)(IOCON_ECHO_ADDRESS))
 
 void Timer1_Init(void);
 void Timer2_Init(void);
@@ -55,5 +63,13 @@ void TIMER3_Stop(void);
 
 void TIMER2_Start(void);
 void TIMER2_Stop(void);
+
+extern uint8_t isUltrasonicSensorTriggerEnded;
+extern uint8_t ultrasonicSensorEdgeCount;
+
+extern uint32_t ultrasonicSensorRisingTime;
+extern uint32_t ultrasonicSensorFallingTime;
+extern uint32_t ultrasonicSensorDuration;
+extern uint32_t ultrasonicSensorDistance;
 
 #endif

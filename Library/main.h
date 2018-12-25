@@ -8,6 +8,7 @@
 #include "PWM.h"
 #include "Joystick.h"
 #include "LED.h"
+#include "ADC.h"
 #include "Wait.h"
 #include "Parameters.h"
 

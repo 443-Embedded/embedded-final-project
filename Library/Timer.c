@@ -39,6 +39,9 @@ void Timer2_Init() {
 	//Set the function of P0_4 to T2_CAP0 
 	IOCON_TIMER2_CAP0 |= 3;
 	
+	//Set the function of P0_7 to T2_MAT1
+	IOCON_TRIGGER = 3;
+	
 	//Enable capture rising edge for both CAP0 and CAP1
 	TIMER2->CCR |= 1 << 0 | 1 << 3;
 	
@@ -50,6 +53,12 @@ void Timer2_Init() {
 	
 	//Change the mode of Timer2 to Timer Mode.
 	TIMER2->CTCR = 0x00;
+	
+	//TRIGGER INIT
+	//Change PR Register value for 1 microsecond incrementing
+	TIMER2->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000000 - 1;
+	//Write the Correct Configuration for EMR (Toggle Output Value and Initial value is HIGH)
+	TIMER2->EMR |= (1 << 1 | 3 << 6);
 	
 	//Clear pendings for Timer2
 	NVIC_ClearPendingIRQ(TIMER2_IRQn);
@@ -63,6 +72,9 @@ void Timer2_Init() {
 
 void Timer3_Init() {
 	PCONP |= (1 << 23);
+	
+	IOCON_ECHO = 3;
+	
 	// TIMER 3
 	//Change the mode of Timer3 to Timer Mode.
 	TIMER3->CTCR = 0x00;
@@ -74,21 +86,15 @@ void Timer3_Init() {
 	TIMER3->TCR |= (1 << 1);
 	
 	//Change PR Register value for 1 microsecond incrementing
-	TIMER3->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000 - 1;
+	TIMER3->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000000 - 1;
 	
-	//Set MR0 to 250 in order to blink LED in every 250ms.
-	TIMER3->MR0 = 250;
-	//After match occurs, interrupt on MR0 and reset MR0
-	TIMER3->MCR |= 3;
+	//ECHO INIT
+	TIMER3->CCR |= (5 << 3);
 	
-	//Clear pendings for Timer3.
-	NVIC_ClearPendingIRQ(TIMER3_IRQn);
-	
-	//Set Priority Timer3 IRQ as 5.
-	NVIC_SetPriority(TIMER3_IRQn, 5);
-	
-	//Enable TIMER3_IRQn (Interrupt Request).
-	NVIC_EnableIRQ(TIMER3_IRQn);
+	//Remove the reset on counters of Timer3.
+	TIMER3->TCR &= ~(1 << 1);
+	//Enable Timer3 Counter and Prescale Counter for counting.
+	TIMER3->TCR |= (1 << 0);
 }
 
 // Starts timer1 for LEDs
@@ -140,7 +146,12 @@ void TIMER2_Start() {
 	tacho[0] = tacho[1] = 0;
 	
 	//Enable interrupts for both CAP0 and CAP1
-	TIMER2->CCR |= 1 << 2 | 1 << 5;
+	// TIMER2->CCR |= 1 << 2 | 1 << 5;
+	
+	//Give correct value to MR1 Register for 10 microsecond
+	TIMER2->MR1 = 10;
+	//Enable interrupt for MR1 register, if MR1 register matches the TC.
+	TIMER2->MCR |= (1 << 3 | 1 << 4);
 	
 	//Reset Timer Counter and Prescale Counter for Timer2.
 	TIMER2->TCR |= (1 << 1);
@@ -158,20 +169,99 @@ void TIMER2_Stop() {
 	//Disable interrupts for both CAP0 and CAP1
 	TIMER2->CCR &= ~(1 << 2 | 1 << 5);
 }
+
+uint8_t isUltrasonicSensorTriggerEnded = 0;
+uint8_t ultrasonicSensorEdgeCount = 0;
+
 /*
 * Depending on the capture register, we increment tacho count of corresponding motor. If a motors completes its 
 * total rotation then stops the wheel, if both completes turns off LEDs.
 */
 void TIMER2_IRQHandler() {
-	int IR_idx = 4;
-	if(TIMER2->IR & (1 << 5))
-		IR_idx = 5;
-	tacho[IR_idx - 4]++;
-	if(tacho[IR_idx - 4] >= HOLE_NUMBER_FOR_90_DEGREE) {
-		MOTOR_Direction(IR_idx - 4, STOP);
-		if(tacho[5 - IR_idx] >= HOLE_NUMBER_FOR_90_DEGREE)
-			LED_Adjuster(STOP_LED);
+	if ((TIMER2->IR & (1 << 1))) {
+			if(isUltrasonicSensorTriggerEnded == 0) {
+			//Change MR1 Register Value for Suggested Waiting
+			TIMER2->MR1 = 60000;
+			
+			isUltrasonicSensorTriggerEnded = 1;
+			
+			ultrasonicSensorEdgeCount = 0;
+			
+			//Clear pendings for Timer3.
+			NVIC_ClearPendingIRQ(TIMER3_IRQn);
+			
+			//Enable TIMER3_IRQn (Interrupt Request).
+			NVIC_EnableIRQ(TIMER3_IRQn);
+		}
+		else {
+			TIMER2->MR1 = 10;
+			isUltrasonicSensorTriggerEnded = 0;
+		}
+		
+		//Clear IR Register Flag for Corresponding Interrupt
+		TIMER2->IR = (1 << 1);
+		
+		TIMER2->TC = 0;
+	} 
+	if (0) {
+		int IR_idx = 4;
+		if(TIMER2->IR & (1 << 5))
+			IR_idx = 5;
+		tacho[IR_idx - 4]++;
+		if(tacho[IR_idx - 4] >= HOLE_NUMBER_FOR_90_DEGREE) {
+			MOTOR_Direction(IR_idx - 4, STOP);
+			if(tacho[5 - IR_idx] >= HOLE_NUMBER_FOR_90_DEGREE)
+				LED_Adjuster(STOP_LED);
+		}
+		//Clear the interrupt flag for CAP channel event
+		TIMER2->IR = (1 << IR_idx);
 	}
-	//Clear the interrupt flag for CAP channel event
-	TIMER2->IR = (1 << IR_idx);
 }
+
+uint32_t ultrasonicSensorRisingTime = 0;
+uint32_t ultrasonicSensorFallingTime = 0;
+uint32_t ultrasonicSensorDuration = 0;
+uint32_t ultrasonicSensorDistance = 0;
+
+void TIMER3_IRQHandler() {
+	if(ultrasonicSensorEdgeCount == 0) {
+		
+		//Store the rising time into ultrasonicSensorRisingTime variable
+		ultrasonicSensorRisingTime = TIMER3->CR1;
+		
+		uint32_t value = TIMER3->CCR;
+		value |= (1 << 4);
+		value &= ~(1 << 3);
+		TIMER3->CCR = value;
+		
+		ultrasonicSensorEdgeCount = 1;
+	}
+	else if(ultrasonicSensorEdgeCount == 1){
+		
+		//Store the falling time into ultrasonicSensorFallingTime variable
+		ultrasonicSensorFallingTime = TIMER3->CR1;
+		
+		uint32_t value = TIMER3->CCR;
+		value |= (1 << 3);
+		value &= ~(1 << 4);
+		TIMER3->CCR = value;
+		
+		ultrasonicSensorEdgeCount = 2;
+		
+		ultrasonicSensorDistance = (ultrasonicSensorFallingTime - ultrasonicSensorRisingTime) / 58;
+		
+		if (ultrasonicSensorDistance <= 15) {
+			LED_Adjuster(STOP_LED);
+			MOTOR_Direction(0, STOP);
+			MOTOR_Direction(1, STOP);
+		}
+
+		//Clear pendings for Timer3.
+		NVIC_ClearPendingIRQ(TIMER3_IRQn);
+		//Disable TIMER3_IRQn (Interrupt Request).
+		NVIC_DisableIRQ(TIMER3_IRQn);
+	}
+	
+	TIMER3->IR = 1 << 5;
+}
+
