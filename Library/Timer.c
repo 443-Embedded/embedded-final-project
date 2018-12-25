@@ -40,7 +40,7 @@ void Timer2_Init() {
 	IOCON_TIMER2_CAP0 |= 3;
 	
 	//Set the function of P0_7 to T2_MAT1
-	IOCON_TRIGGER = 3;
+	IOCON_TRIGGER |= 3;
 	
 	//Enable capture rising edge for both CAP0 and CAP1
 	TIMER2->CCR |= 1 << 0 | 1 << 3;
@@ -55,8 +55,8 @@ void Timer2_Init() {
 	TIMER2->CTCR = 0x00;
 	
 	//TRIGGER INIT
-	//Change PR Register value for 1 microsecond incrementing
-	TIMER2->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000000 - 1;
+	//Change PR Register value for 10 microsecond incrementing
+	TIMER2->PR = PERIPHERAL_CLOCK_FREQUENCY / 100000 - 1;
 	//Write the Correct Configuration for EMR (Toggle Output Value and Initial value is HIGH)
 	TIMER2->EMR |= (1 << 1 | 3 << 6);
 	
@@ -73,7 +73,7 @@ void Timer2_Init() {
 void Timer3_Init() {
 	PCONP |= (1 << 23);
 	
-	IOCON_ECHO = 3;
+	IOCON_ECHO |= 3;
 	
 	// TIMER 3
 	//Change the mode of Timer3 to Timer Mode.
@@ -109,7 +109,7 @@ void TIMER1_Start() {
 
 // Stops timer1 for LEDs
 void TIMER1_Stop() {
-	//Disable counter for timer3
+	//Disable counter for timer1
 	TIMER1->TCR &= ~(1 << 0);
 	
 	//Flag for direction of rotation, if it is not 0 then rotation is in that way.
@@ -179,7 +179,7 @@ uint8_t ultrasonicSensorEdgeCount = 0;
 */
 void TIMER2_IRQHandler() {
 	if ((TIMER2->IR & (1 << 1))) {
-			if(isUltrasonicSensorTriggerEnded == 0) {
+		if(isUltrasonicSensorTriggerEnded == 0) {
 			//Change MR1 Register Value for Suggested Waiting
 			TIMER2->MR1 = 60000;
 			
@@ -203,7 +203,7 @@ void TIMER2_IRQHandler() {
 		
 		TIMER2->TC = 0;
 	} 
-	if (0) {
+	if ((TIMER2->IR & (1 << 4)) || (TIMER2->IR & (1 << 5))) {
 		int IR_idx = 4;
 		if(TIMER2->IR & (1 << 5))
 			IR_idx = 5;
@@ -222,6 +222,8 @@ uint32_t ultrasonicSensorRisingTime = 0;
 uint32_t ultrasonicSensorFallingTime = 0;
 uint32_t ultrasonicSensorDuration = 0;
 uint32_t ultrasonicSensorDistance = 0;
+
+uint8_t goBack = 0;
 
 void TIMER3_IRQHandler() {
 	if(ultrasonicSensorEdgeCount == 0) {
@@ -250,10 +252,16 @@ void TIMER3_IRQHandler() {
 		
 		ultrasonicSensorDistance = (ultrasonicSensorFallingTime - ultrasonicSensorRisingTime) / 58;
 		
-		if (ultrasonicSensorDistance <= 15) {
-			LED_Adjuster(STOP_LED);
-			MOTOR_Direction(0, STOP);
-			MOTOR_Direction(1, STOP);
+		if (ultrasonicSensorDistance <= 15 && FORWARD_FLAG) {
+			LED_Adjuster(BACKWARD_LED);
+			MOTOR_Direction(0, BACKWARD);
+			MOTOR_Direction(1, BACKWARD);
+			goBack = 1;
+		} else if (ultrasonicSensorDistance > 30 && goBack) {
+			LED_Adjuster(FORWARD_LED);
+			MOTOR_Direction(0, FORWARD);
+			MOTOR_Direction(1, FORWARD);
+			goBack = 0;
 		}
 
 		//Clear pendings for Timer3.

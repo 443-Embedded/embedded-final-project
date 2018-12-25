@@ -11,6 +11,7 @@
 #include "ADC.h"
 #include "Wait.h"
 #include "Parameters.h"
+#include "External.h"
 
 typedef enum {
 	STOP,	FORWARD, BACKWARD

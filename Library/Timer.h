@@ -72,4 +72,6 @@ extern uint32_t ultrasonicSensorFallingTime;
 extern uint32_t ultrasonicSensorDuration;
 extern uint32_t ultrasonicSensorDistance;
 
+extern uint8_t goBack;
+
 #endif
