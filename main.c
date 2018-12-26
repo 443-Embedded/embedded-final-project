@@ -17,6 +17,14 @@ void init() {
 	Timer0_Start();
 	TIMER2_Start();
 	TIMER3_Start();
+	
+	ESP8266_Init();
+	
+	wait(100);
+	
+	ESP8266_sendCommand("AT\r\n");
+	//wait(100);
+	ESP8266_waitResponseEnd();
 }
 
 /*

@@ -12,6 +12,7 @@
 #include "Wait.h"
 #include "Parameters.h"
 #include "External.h"
+#include "ESP8266.h"
 
 typedef enum {
 	STOP,	FORWARD, BACKWARD
