@@ -28,7 +28,7 @@ void Timer0_Start() {
 	TIMER0->TCR |= (1 << 1);
 	
 	//Enable Timer Counter and Prescale Counter
-	TIMER0->TCR &= (1 << 0);
+	TIMER0->TCR |= (1 << 0);
 	
 	//Clear reset of timer and prescale counter
 	TIMER0->TCR &= ~(1 << 1);
@@ -46,7 +46,7 @@ void TIMER0_IRQHandler() {
 	ADC_Start();
 	
 	//Clear the interrupt flag for MAT channel 0 event
-	TIMER1->IR = (1 << 0);
+	TIMER0->IR = (1 << 0);
 }
 
 void Timer1_Init() {
@@ -143,8 +143,8 @@ void Timer2_Init() {
 	//Change PR Register value for 1 microsecond incrementing
 	TIMER2->PR = PERIPHERAL_CLOCK_FREQUENCY / 1000000 - 1;
 
-	//Enable interrupt for MR1 register, reset and stop if MR1 register matches the TC.
-	TIMER2->MCR |= (1 << 3) | (1 << 4) | (1 << 5);
+	//Enable interrupt for MR1 register, stop if MR1 register matches the TC.
+	TIMER2->MCR |= (5 << 3);
 	
 	//Write the Correct Configuration for EMR (Toggle Output)
 	TIMER2->EMR |= (3 << 6);
@@ -187,23 +187,24 @@ uint8_t ultrasonicSensorEdgeCount = 0;
 * Depending on the capture register, we increment tacho count of corresponding motor. If a motors completes its 
 * total rotation then stops the wheel, if both completes turns off LEDs.
 */
-void TIMER2_IRQHandler() {
+void TIMER2_IRQHandler() { 
 	if ((TIMER2->IR & (1 << 1))) {
 		if(TIMER2->MR1 == 10) {
 			//Change MR1 Register Value for Suggested Waiting
 			TIMER2->MR1 = 60000;
-
-			//Start timer again
-			TIMER2->TCR |= 1 << 0;
 			
 			ultrasonicSensorEdgeCount = 0;
 		}
 		else {
 			TIMER2->MR1 = 10;
-
-			//Start timer again
-			TIMER2->TCR |= 1 << 0;
 		}
+		
+		//Reset Timer Counter and Prescale Counter for Timer2.
+		TIMER2->TCR |= (1 << 1);
+		//Start timer again
+		TIMER2->TCR |= 1 << 0;
+		//Remove reset on Timer2.
+		TIMER2->TCR &= ~(1 << 1);
 		
 		//Clear IR Register Flag for Corresponding Interrupt
 		TIMER2->IR = (1 << 1);
@@ -262,12 +263,12 @@ void TIMER3_IRQHandler() {
 	else if(ultrasonicSensorEdgeCount == 1){
 		ultrasonicSensorDistance = (TIMER3->CR1 - ultrasonicSensorRisingTime) / 58;
 		
-		if (ultrasonicSensorDistance <= 15 && FORWARD_FLAG) {
+		if (ultrasonicSensorDistance <= OBSTACLE_DISTANCE && FORWARD_FLAG) {
 			LED_Adjuster(BACKWARD_LED);
 			MOTOR_Direction(0, BACKWARD);
 			MOTOR_Direction(1, BACKWARD);
 			goBack = 1;
-		} else if (ultrasonicSensorDistance > 30 && goBack) {
+		} else if (ultrasonicSensorDistance > OBSTACLE_ESCAPE_DISTANCE && FORWARD_FLAG && goBack) {
 			LED_Adjuster(FORWARD_LED);
 			MOTOR_Direction(0, FORWARD);
 			MOTOR_Direction(1, FORWARD);

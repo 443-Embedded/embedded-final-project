@@ -10,6 +10,9 @@ typedef enum {
 extern uint32_t ROBOT_SPEED;
 extern const uint32_t HOLE_NUMBER_FOR_90_DEGREE;
 
+extern const uint32_t OBSTACLE_DISTANCE;
+extern const uint32_t OBSTACLE_ESCAPE_DISTANCE;
+
 extern uint8_t START_MODE;
 
 extern volatile uint32_t TURN_LEFT_FLAG, TURN_RIGHT_FLAG, FORWARD_FLAG, BACKWARD_FLAG;

@@ -49,9 +49,9 @@ uint32_t ADC_LEFT_LDR;
 
 void set_speed() {
 	ROBOT_SPEED = 100 * (ADC_TRIMPOT - ADC_TRIMPOT_MIN) / (ADC_TRIMPOT_MAX - ADC_TRIMPOT_MIN);
-	if(FORWARD_FLAG) {
-		uint32_t leftSpeed = ROBOT_SPEED - LDR_WEIGHT * ADC_LEFT_LDR / ADC_MAX;
-		uint32_t rightSpeed = ROBOT_SPEED - LDR_WEIGHT * ADC_RIGHT_LDR / ADC_MAX;
+	if(FORWARD_FLAG && goBack == 0) {
+		uint32_t leftSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_LEFT_LDR / ADC_MAX / 100;
+		uint32_t rightSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_RIGHT_LDR / ADC_MAX / 100;
 		uint32_t inc = ROBOT_SPEED - (leftSpeed + rightSpeed) / 2;
 		if(leftSpeed + inc > 100) {
 			rightSpeed += 100 - leftSpeed;
@@ -61,8 +61,16 @@ void set_speed() {
 			leftSpeed += 100 - rightSpeed;
 			rightSpeed = 100;
 		}
+		else {
+			leftSpeed += inc;
+			rightSpeed += inc;
+		}
 		PWM_MOTOR_Write(rightSpeed, 0);	
  		PWM_MOTOR_Write(leftSpeed, 1);
+	}
+	else {
+		PWM_MOTOR_Write(ROBOT_SPEED, 0);
+ 		PWM_MOTOR_Write(ROBOT_SPEED, 1);
 	}
 }
 
@@ -80,11 +88,11 @@ void ADC_IRQHandler() {
 		ADC->CR |= (1 << 3);
 		ADC->CR |= (1 << 24);
 	}
-	else if ((val = ADC->DR[2]) >> 31) {
+	else if ((val = ADC->DR[3]) >> 31) {
 		ADC_LEFT_LDR = (val >> 4) & 0xFFF;
 		ADC->CR &= ~(1 << 3);
 		ADC->CR |= (1 << 0);
-		ADC->CR |= ~(1 << 24);
+		ADC->CR &= ~(1 << 24);
 
 		set_speed();
 	}

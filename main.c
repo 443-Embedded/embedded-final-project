@@ -16,6 +16,7 @@ void init() {
 	ADC_Init();
 	Timer0_Start();
 	TIMER2_Start();
+	TIMER3_Start();
 }
 
 /*

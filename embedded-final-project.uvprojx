@@ -442,6 +442,11 @@
               <FileType>1</FileType>
               <FilePath>.\Library\External.c</FilePath>
             </File>
+            <File>
+              <FileName>ESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Library\ESP8266.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

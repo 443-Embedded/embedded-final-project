@@ -19,6 +19,24 @@ void GPIO_Init() {
 	PORT5->DIR &= ~(1 << 0 | 1 << 1 | 1 << 2 | 1 << 3 | 1 << 4);
 }
 
+void GPIO_DIR_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value) {
+	if(value == 0) {
+		PORT->DIR &= ~MASK;
+	}
+	else {
+		PORT->DIR |= MASK;
+	}
+}
+
+void GPIO_PIN_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value) {
+	if(value == 0) {
+		PORT->PIN &= ~MASK;
+	}
+	else {
+		PORT->PIN |= MASK;
+	}
+}
+
 // Returns given pin value for GPIOs
 uint32_t GPIO_PIN_Read(GPIO_TypeDef* PORT,uint32_t MASK) {
 	return PORT->PIN & MASK;

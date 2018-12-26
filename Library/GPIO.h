@@ -60,6 +60,9 @@ typedef enum {
 #define IOCON_RIGHT	*((volatile uint32_t*)(IOCON_RIGHT_ADDR))
 
 void GPIO_Init(void);
+
+void GPIO_DIR_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value);
+void GPIO_PIN_Write(GPIO_TypeDef* PORT,uint32_t MASK,uint8_t value);
 uint32_t GPIO_PIN_Read(GPIO_TypeDef* PORT,uint32_t MASK);
 
 #endif

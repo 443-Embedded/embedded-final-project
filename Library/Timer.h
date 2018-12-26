@@ -52,9 +52,9 @@ typedef struct {
 #define IOCON_ECHO_ADDRESS	0x4002C060 //P0.24
 #define IOCON_ECHO	*((volatile uint32_t*)(IOCON_ECHO_ADDRESS))
 
-void Timer0_Init();
-void Timer0_Start();
-void Timer0_Stop();
+void Timer0_Init(void);
+void Timer0_Start(void);
+void Timer0_Stop(void);
 
 void Timer1_Init(void);
 void Timer2_Init(void);

@@ -5,6 +5,9 @@ volatile uint32_t TURN_LEFT_FLAG = 0, TURN_RIGHT_FLAG = 0, FORWARD_FLAG = 0, BAC
 uint32_t ROBOT_SPEED = 0;
 const uint32_t HOLE_NUMBER_FOR_90_DEGREE = 6;
 
+const uint32_t OBSTACLE_DISTANCE = 15;
+const uint32_t OBSTACLE_ESCAPE_DISTANCE = 30;
+
 const uint32_t MOTOR_PINS[2][2] = {{9, 8}, {1, 0}};
 
 const uint32_t LED_PINS[4] = {5, 6, 7, 11};
