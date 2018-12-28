@@ -47,6 +47,33 @@ uint32_t ADC_TRIMPOT;
 uint32_t ADC_RIGHT_LDR;
 uint32_t ADC_LEFT_LDR;
 
+
+
+// PID Part --- set these 3 coefficients
+uint32_t Kp = -1;   // Tahmini değer aralığı 200-1000
+uint32_t Ki = -1;   // max 100 gibi
+uint32_t Kd = -1;   // max 50 gibi
+uint32_t prev_error = 0;
+uint32_t total_error = 0;
+
+// Left_LDR - Right_LDR --> error 
+// Add this value to left motor and subtract from right motor
+uint32_t pid(uint32_t error) {
+	uint32_t combinedPIDValues = 0;
+	// P 
+	combinedPIDValues += Kp * error;
+	
+	// I
+	total_error += Ki * error * 20; // 20ms beklediğimiz için
+	combinedPIDValues += Ki * total_error;
+	
+	// D
+	combinedPIDValues +=(Kd * (error - prev_error)) / 20; // 20ms beklediğimiz için
+	prev_error = error;
+	
+	return combinedPIDValues / 1000;
+}
+
 void set_speed() {
 	ROBOT_SPEED = 100 * (ADC_TRIMPOT - ADC_TRIMPOT_MIN) / (ADC_TRIMPOT_MAX - ADC_TRIMPOT_MIN);
 	if(FORWARD_FLAG && goBack == 0) {
