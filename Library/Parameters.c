@@ -16,6 +16,8 @@ const uint32_t LED_PINS[4] = {5, 6, 7, 11};
 
 uint8_t START_MODE = MANUAL;
 
+const uint8_t COMM_TYPE = UART_COMM;
+
 void changeStartMode (START_State state) {
 	START_MODE = state;
 	MOTOR_Direction(1, STOP);

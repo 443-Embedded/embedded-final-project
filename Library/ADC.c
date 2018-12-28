@@ -48,7 +48,7 @@ int32_t ADC_RIGHT_LDR;
 int32_t ADC_LEFT_LDR;
 
 // PID Part --- set these 3 coefficients
-int32_t Kp = 1000;   // Tahmini değer aralığı 200-1000
+int32_t Kp = 800;   // Tahmini değer aralığı 200-1000
 int32_t Ki = 5;   // max 100 gibi
 int32_t Kd = 15;   // max 50 gibi
 int32_t prev_error = 0;

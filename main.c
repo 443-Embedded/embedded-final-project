@@ -18,13 +18,15 @@ void init() {
 	TIMER2_Start();
 	TIMER3_Start();
 	
-	if(0){
+	if(COMM_TYPE == WIFI_COMM){
 		ESP8266_Init();
 		wait(200);
 		
 		ESP8266_sendCommand("AT+CWJAP=\"HWLAB\",\"12345678\"\r\n");
 		wait(3000);
 		ESP8266_waitResponseEnd();
+	} else if(COMM_TYPE == UART_COMM){
+		Serial_Init();
 	}
 	
 }
@@ -121,12 +123,13 @@ int main() {
 	init();		// Initializes everything
 	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
 	while(1) {	// Event loop
-		//wifi_check();
 		switch(START_MODE) {
 			case AUTO:
-				MOTOR_Direction(1, STOP);
-				MOTOR_Direction(0, STOP);
-				LED_Adjuster(STOP_LED);
+				if(COMM_TYPE == WIFI_COMM){
+					wifi_check();
+				} else if(COMM_TYPE == UART_COMM){
+					//Serial_Init();
+				}
 				break;
 			case MANUAL:
 				update();

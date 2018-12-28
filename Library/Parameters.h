@@ -7,6 +7,10 @@ typedef enum {
 	MANUAL, AUTO
 } START_State;
 
+typedef enum {
+	BASIC, UART_COMM, WIFI_COMM
+} COMM_State;
+
 extern uint32_t ROBOT_SPEED;
 extern const uint32_t HOLE_NUMBER_FOR_90_DEGREE;
 
@@ -18,6 +22,8 @@ extern uint8_t START_MODE;
 extern volatile uint32_t TURN_LEFT_FLAG, TURN_RIGHT_FLAG, FORWARD_FLAG, BACKWARD_FLAG;
 extern const uint32_t MOTOR_PINS[2][2];
 extern const uint32_t LED_PINS[4];
+
+extern const uint8_t COMM_TYPE;
 
 void changeStartMode (START_State state);
 #endif

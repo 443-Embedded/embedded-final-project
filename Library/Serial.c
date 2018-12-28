@@ -4,8 +4,13 @@ char* serialTransmitData = 0;
 uint8_t serialTransmitCompleted = 0;
 char serialReceivedCharacter = 0;
 
+char prevChar = 0;
+char currentChar = 0;
+
 void Serial_Init() {
 	//Change the function of TX and RX pins for UART.
+	Serial_UART_TX_PIN |= 1;
+	Serial_UART_RX_PIN |= 1;
 	
 	//Turn on UART0.
 	PCONP |= 1 <<  3;
@@ -28,7 +33,7 @@ void Serial_Init() {
 	Serial_UART->LCR &= ~(1 << 7);
 	
 	//Change LCR register value for 8-bit character transfer, 1 stop bits and Even Parity.
-	Serial_UART->LCR |= 3 << 3;
+	Serial_UART->LCR |= 3 << 0 | 3 << 3;
 	Serial_UART->LCR &= ~(1 << 2);
 							
 	//Enable the Receive Data Available and THRE Interrupt.
@@ -43,20 +48,26 @@ void Serial_Init() {
 }
 
 void UART0_IRQHandler() {	
-	uint32_t currentInterrupt = ((Serial_UART->IIR & (0x7 << 1)) >> 1);
-	
-	//First if statement is for Receive Data Available interrupt.
-	if(currentInterrupt == 0x00) {
-		serialReceivedCharacter = Serial_ReadData();
+	prevChar = currentChar;
+	currentChar = Serial_ReadData();
+	Serial_WriteData(currentChar);
+	if (currentChar == '*') {
+		changeStartMode(MANUAL);
+		Serial_Write("Mode is MANUAL!");
 	}
-	//Second if statement is for THRE interrupt
-	else if(currentInterrupt == 0x00) {
-		if(*serialTransmitData > 0) {
-			Serial_WriteData(*serialTransmitData++);
-		}
-		else {
-			serialTransmitCompleted = 1;
-		}
+	
+	if (currentChar == '#') {
+		changeStartMode(AUTO);
+		Serial_Write("Mode is AUTO!");
+	}
+	
+	if (START_MODE == AUTO && !FORWARD_FLAG && prevChar == '6' && currentChar == '6') {
+		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = BACKWARD_FLAG = 0;
+		FORWARD_FLAG = 1;
+		MOTOR_Direction(0, FORWARD);
+		MOTOR_Direction(1, FORWARD);
+		LED_Adjuster(FORWARD_LED);
+		Serial_Write("Start!");
 	}
 }
 
@@ -65,7 +76,12 @@ char Serial_ReadData() {
 }
 
 void Serial_WriteData(char data) {
-	serialTransmitCompleted = 0;
+	while (!(Serial_UART->LSR & 0x20));
 	Serial_UART->THR = data;
 }
 
+void Serial_Write(char* data) {
+	while(*data)  {
+		Serial_WriteData(*data++);
+	}
+}

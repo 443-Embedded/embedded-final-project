@@ -4,6 +4,7 @@
 #include "LPC407x_8x_177x_8x.h"
 
 #include "SystemStructures.h"
+#include "main.h"
 
 #pragma anon_unions
 
@@ -46,18 +47,18 @@ typedef struct
 	volatile	uint8_t  RS485DLY;
 						uint8_t  RESERVED11[3];
 	volatile  uint8_t  FIFOLVL;
-}UART_TypeDef;
+} UART_TypeDef;
 
 //Write the base address of the UART0.
 #define Serial_UART_BASE	0x4000C000
 #define Serial_UART	((UART_TypeDef*) Serial_UART_BASE)
 
 //Write the IOCON address of TX Pin
-#define Serial_UART_TX_PIN_ADDRESS	0x00000000
+#define Serial_UART_TX_PIN_ADDRESS	0x4002C008
 #define Serial_UART_TX_PIN	*((volatile uint32_t*)(Serial_UART_TX_PIN_ADDRESS))
 
 //Write the IOCON address of PX Pin
-#define Serial_UART_RX_PIN_ADDRESS	0x00000000
+#define Serial_UART_RX_PIN_ADDRESS	0x4002C00C
 #define Serial_UART_RX_PIN	*((volatile uint32_t*)(Serial_UART_RX_PIN_ADDRESS))
 
 extern char serialReceivedCharacter;
@@ -67,5 +68,7 @@ extern uint8_t serialTransmitCompleted;
 void Serial_Init(void);
 char Serial_ReadData(void);
 void Serial_WriteData(char data);
+
+void Serial_Write(char* data);
 
 #endif
