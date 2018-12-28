@@ -80,6 +80,7 @@ char* ESP8266_readResponse(void);
 void ESP8266_clearBuffer(void);
 
 char ESP8266_ReadData(void);
+void changeBaudRate(uint32_t rate);
 void ESP8266_WriteData(char data);
 void ESP8266_Write(char* data);
 

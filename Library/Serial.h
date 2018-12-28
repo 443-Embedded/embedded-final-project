@@ -49,7 +49,7 @@ typedef struct
 }UART_TypeDef;
 
 //Write the base address of the UART0.
-#define Serial_UART_BASE	0x00000000
+#define Serial_UART_BASE	0x4000C000
 #define Serial_UART	((UART_TypeDef*) Serial_UART_BASE)
 
 //Write the IOCON address of TX Pin

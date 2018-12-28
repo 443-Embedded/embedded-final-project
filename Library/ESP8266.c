@@ -8,16 +8,24 @@ uint8_t esp8266ResponseCurrentIndex;
 char esp8266Buffer[ESP8266BufferSize];
 char esp8266Response[ESP8266BufferSize];
 
+void changeBaudRate(uint32_t rate) {
+	ESP8266_UART->LCR |= (1 << 7);
+	
+	//Write correct DLM, DLL and FDR values for 115200 baudrate
+	if (rate == 115200) {
+		ESP8266_UART->DLM = 0x00;
+		ESP8266_UART->DLL = 0x13;
+		ESP8266_UART->FDR = 0x05 << 0 | 0x07 << 4;
+	} else if (rate == 9600) {
+		ESP8266_UART->DLM = 0x01;
+		ESP8266_UART->DLL = 0x25;
+		ESP8266_UART->FDR = 0x01 << 0 | 0x03 << 4;
+	}
+
+	ESP8266_UART->LCR &= ~(1 << 7);
+}
+
 void ESP8266_Init() {
-	P0 &= ~(7);
-	P1 &= ~(7);
-	
-	GPIO_DIR_Write(PORT1,1 << 20,OUTPUT);
-	GPIO_DIR_Write(PORT0,1 << 21,OUTPUT);
-	
-	GPIO_PIN_Write(PORT1,1 << 20,HIGH);
-	GPIO_PIN_Write(PORT0,1 << 21,HIGH);
-	
 	ESP8266_UART_TX_PIN |= 0x02;
 	ESP8266_UART_RX_PIN |= 0x02;
 	
@@ -28,16 +36,12 @@ void ESP8266_Init() {
 						 |	0 << 2
 						 |	0 << 6;
 	
-	ESP8266_UART->LCR |= (1 << 7);
+	changeBaudRate(115200);
 	
-	//Write correct DLM, DLL and FDR values for 115200 baudrate
-	ESP8266_UART->DLM = 0x00;
-	ESP8266_UART->DLL = 0x13;
-	ESP8266_UART->FDR = 0x05 << 0 | 0x07 << 4;
-
-	ESP8266_UART->LCR &= ~(1 << 7);
-	
-	ESP8266_UART->LCR =	3 << 0;
+	ESP8266_UART->LCR =	3 << 0
+							| 0 << 2
+							| 0 << 3
+							| 0 << 4;
 	
 	//Enable the Receive Data Available Interrupt.
 	ESP8266_UART->IER |= (1 << 0);
@@ -58,10 +62,9 @@ void ESP8266_sendCommand(char* command) {
 }
 
 uint8_t ESP8266_waitResponseEnd() {
-	uint8_t responseEnd = 0;
 	uint8_t responseEndIndex;
 	uint8_t bufferIndex;
-	while(!responseEnd) {
+	for(;;) {
 		responseEndIndex = (esp8266CurrentBufferIndex - esp8266ResponseStartIndex);
 		for(; esp8266ResponseCurrentIndex < responseEndIndex; esp8266ResponseCurrentIndex++) {
 			bufferIndex = esp8266ResponseStartIndex + esp8266ResponseCurrentIndex;
@@ -120,15 +123,12 @@ void ESP8266_WriteData(char data) {
 }
 
 void ESP8266_Write(char* data) {
-	while(*data > 0)  {
+	while(*data)  {
 		ESP8266_WriteData(*data++);
 	}
 }
 
 void UART3_IRQHandler() {
-	char data;
-	data = ESP8266_ReadData();
-	esp8266Buffer[esp8266CurrentBufferIndex] = data;
-	esp8266CurrentBufferIndex++;
+	esp8266Buffer[esp8266CurrentBufferIndex++] = ESP8266_ReadData();
 }
 

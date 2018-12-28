@@ -18,13 +18,25 @@ void init() {
 	TIMER2_Start();
 	TIMER3_Start();
 	
-	ESP8266_Init();
+	//ESP8266_Init();
 	
-	wait(100);
-	
-	ESP8266_sendCommand("AT\r\n");
 	//wait(100);
-	ESP8266_waitResponseEnd();
+	
+	//ESP8266_sendCommand("AT+IPR=9600\r\n");
+	//wait(2000);
+	//changeBaudRate(9600);
+	//ESP8266_sendCommand("AT+RST\r\n");
+	
+	//wait(2000);
+	
+	//ESP8266_sendCommand("AT\r\n");
+	//ESP8266_sendCommand("AT+CWJAP =\"HWLAB\",\"12345678\"\r\n");
+	//wait(3000);
+	//ESP8266_waitResponseEnd();
+	
+	
+	//wait(100);
+	//ESP8266_waitResponseEnd();
 }
 
 /*
