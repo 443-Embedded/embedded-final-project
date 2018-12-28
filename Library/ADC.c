@@ -51,7 +51,7 @@ int32_t ADC_LEFT_LDR;
 
 // PID Part --- set these 3 coefficients
 int32_t Kp = 800;   // Tahmini değer aralığı 200-1000
-int32_t Ki = 0;   // max 100 gibi
+int32_t Ki = 1;   // max 100 gibi
 int32_t Kd = 15;   // max 50 gibi
 int32_t prev_error = 0;
 int32_t total_error = 0;
@@ -64,11 +64,7 @@ int32_t pid(int32_t error) {
 	combinedPIDValues += Kp * error;
 	
 	// I
-	total_error += error * 10; // 10ms beklediğimiz için
-	if(total_error >= 0xFFF * 10)
-		total_error = 0xFFF * 10;
-	else if(-total_error >= 0xFFF * 10)
-		total_error = -0xFFF * 10;
+	total_error = total_error * 9 / 10 + error * 10; // 10ms beklediğimiz için
 	combinedPIDValues += Ki * total_error;
 	
 	// D
