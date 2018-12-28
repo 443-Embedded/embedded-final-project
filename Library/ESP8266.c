@@ -48,6 +48,9 @@ void ESP8266_Init() {
 	
 	//Enable UART3_IRQn Interrupt.
 	NVIC_ClearPendingIRQ(UART3_IRQn);
+	
+	NVIC_SetPriority(UART3_IRQn, 4);
+	
 	NVIC_EnableIRQ(UART3_IRQn);
 }
 

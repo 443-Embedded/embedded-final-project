@@ -47,8 +47,6 @@ int32_t ADC_TRIMPOT;
 int32_t ADC_RIGHT_LDR;
 int32_t ADC_LEFT_LDR;
 
-
-
 // PID Part --- set these 3 coefficients
 int32_t Kp = 1200;   // Tahmini değer aralığı 200-1000
 int32_t Ki = 10;   // max 100 gibi
@@ -115,6 +113,14 @@ void set_speed() {
 				rightSpeed = rightSpeed * 100 / -leftSpeed;
 				leftSpeed = -100;
 			}
+		}
+		
+		if (rightSpeed - leftSpeed > 20) {
+			LED_Adjuster(LEFT_BLINKER);	
+		} else if (leftSpeed - rightSpeed > 20) {
+			LED_Adjuster(RIGHT_BLINKER);
+		} else {
+			LED_Adjuster(FORWARD_LED);
 		}
 		
 		set_motor(1, rightSpeed);
