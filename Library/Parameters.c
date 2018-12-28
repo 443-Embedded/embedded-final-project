@@ -1,5 +1,7 @@
 #include "Parameters.h"
 
+#include "main.h"
+
 volatile uint32_t TURN_LEFT_FLAG = 0, TURN_RIGHT_FLAG = 0, FORWARD_FLAG = 0, BACKWARD_FLAG = 0;
 
 uint32_t ROBOT_SPEED = 0;
@@ -16,4 +18,8 @@ uint8_t START_MODE = MANUAL;
 
 void changeStartMode (START_State state) {
 	START_MODE = state;
+	MOTOR_Direction(1, STOP);
+	MOTOR_Direction(0, STOP);
+	LED_Adjuster(STOP_LED);
+	TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = BACKWARD_FLAG = 0;
 }

@@ -47,10 +47,7 @@ void ESP8266_Init() {
 	ESP8266_UART->IER |= (1 << 0);
 	
 	//Enable UART3_IRQn Interrupt.
-	NVIC_ClearPendingIRQ(UART3_IRQn);
-	
-	NVIC_SetPriority(UART3_IRQn, 4);
-	
+	NVIC_ClearPendingIRQ(UART3_IRQn);	
 	NVIC_EnableIRQ(UART3_IRQn);
 }
 
@@ -90,6 +87,12 @@ uint8_t ESP8266_waitResponseEnd() {
 		}
 		else if(strstr(esp8266Response, "CONNECTED")) {
 			return 6;
+		}
+		else if(strstr(esp8266Response, "#")) {
+			return 10;
+		}
+		else if(strstr(esp8266Response, "*")) {
+			return 12;
 		}
 	}
 	return 0;

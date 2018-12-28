@@ -15,9 +15,5 @@ void EINT0_IRQHandler(void){
 		changeStartMode(AUTO);
 	}
 	
-	MOTOR_Direction(1, STOP);
-	MOTOR_Direction(0, STOP);
-	LED_Adjuster(STOP_LED);
-	
 	EXT->EXTINT |= 1;
 }

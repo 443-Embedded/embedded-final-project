@@ -48,7 +48,7 @@ int32_t ADC_RIGHT_LDR;
 int32_t ADC_LEFT_LDR;
 
 // PID Part --- set these 3 coefficients
-int32_t Kp = 800;   // Tahmini değer aralığı 200-1000
+int32_t Kp = 1000;   // Tahmini değer aralığı 200-1000
 int32_t Ki = 5;   // max 100 gibi
 int32_t Kd = 15;   // max 50 gibi
 int32_t prev_error = 0;
@@ -115,15 +115,15 @@ void set_speed() {
 			}
 		}
 		
-		if (rightSpeed - leftSpeed > 20 && !TURN_LEFT_FLAG) {
+		if (rightSpeed - leftSpeed > 30 && !TURN_LEFT_FLAG) {
 			TURN_RIGHT_FLAG = BACKWARD_FLAG = 0;
 			TURN_LEFT_FLAG = 1;
 			LED_Adjuster(LEFT_BLINKER);	
-		} else if (leftSpeed - rightSpeed > 20 && !TURN_RIGHT_FLAG) {
+		} else if (leftSpeed - rightSpeed > 30 && !TURN_RIGHT_FLAG) {
 			TURN_LEFT_FLAG = BACKWARD_FLAG = 0;
 			TURN_RIGHT_FLAG = 1;
 			LED_Adjuster(RIGHT_BLINKER);
-		} else {
+		} else if (leftSpeed - rightSpeed <= 15 && rightSpeed - leftSpeed <= 15) {
 			TURN_RIGHT_FLAG = BACKWARD_FLAG = TURN_LEFT_FLAG = 0;
 			FORWARD_FLAG = 1;
 			LED_Adjuster(FORWARD_LED);

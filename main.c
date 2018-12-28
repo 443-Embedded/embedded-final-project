@@ -20,35 +20,11 @@ void init() {
 	
 	if(0){
 		ESP8266_Init();
-	
 		wait(200);
 		
-		//ESP8266_sendCommand("AT+IPR=9600\r\n");
-		//wait(2000);
-		//changeBaudRate(9600);
-		ESP8266_sendCommand("AT\r\n");
-		
-		wait(2000);
-		
-		//ESP8266_sendCommand("AT\r\n");
 		ESP8266_sendCommand("AT+CWJAP=\"HWLAB\",\"12345678\"\r\n");
 		wait(3000);
 		ESP8266_waitResponseEnd();
-		
-		ESP8266_sendCommand("AT+CIPSTART=\"TCP\",\"192.168.0.103\",8080\r\n");
-		wait(3000);
-		ESP8266_waitResponseEnd();
-		
-		ESP8266_sendCommand("AT+CIPSEND=42\r\n");
-		wait(3000);
-		ESP8266_waitResponseEnd();
-		
-		ESP8266_sendCommand("GET /HWLAB_IoT/GetInformation HTTP/1.0\r\n\r\n");
-		wait(2000);
-		ESP8266_waitResponseEnd();
-		
-		//wait(100);
-		//ESP8266_waitResponseEnd();
 	}
 	
 }
@@ -125,11 +101,27 @@ void update() {
 	}
 }
 
+void wifi_check(){
+	ESP8266_sendCommand("AT+CIPSTART=\"TCP\",\"192.168.0.103\",8080\r\n");
+	ESP8266_waitResponseEnd();
+	
+	ESP8266_sendCommand("AT+CIPSEND=47\r\n");
+	ESP8266_waitResponseEnd();
+	
+	ESP8266_sendCommand("GET /HWLAB_IoT/GetInformation?ID=1 HTTP/1.0\r\n\r\n");
+	uint16_t status = ESP8266_waitResponseEnd();
+	if (status == 10) { // && START_MODE != AUTO) {
+		changeStartMode(AUTO);
+	} if (status == 12) { // && START_MODE != MANUAL) {
+		changeStartMode(MANUAL);
+	}
+}
+
 int main() {
 	init();		// Initializes everything
 	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
 	while(1) {	// Event loop
-		ADC_Start();
+		//wifi_check();
 		switch(START_MODE) {
 			case AUTO:
 				MOTOR_Direction(1, STOP);
