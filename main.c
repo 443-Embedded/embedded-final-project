@@ -40,11 +40,11 @@ void init() {
 		ESP8266_waitResponseEnd();
 		
 		ESP8266_sendCommand("AT+CIPSEND=42\r\n");
-		wait(10000);
+		wait(3000);
 		ESP8266_waitResponseEnd();
 		
 		ESP8266_sendCommand("GET /HWLAB_IoT/GetInformation HTTP/1.0\r\n\r\n");
-		wait(10000);
+		wait(2000);
 		ESP8266_waitResponseEnd();
 		
 		//wait(100);
