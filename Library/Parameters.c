@@ -16,7 +16,7 @@ const uint32_t LED_PINS[4] = {5, 6, 7, 11};
 
 uint8_t START_MODE = MANUAL;
 
-const uint8_t COMM_TYPE = UART_COMM;
+const uint8_t COMM_TYPE = BASIC;
 
 void changeStartMode (START_State state) {
 	START_MODE = state;
@@ -24,4 +24,28 @@ void changeStartMode (START_State state) {
 	MOTOR_Direction(0, STOP);
 	LED_Adjuster(STOP_LED);
 	TURN_LEFT_FLAG = TURN_RIGHT_FLAG = FORWARD_FLAG = BACKWARD_FLAG = 0;
+	if (COMM_TYPE == WIFI_COMM) {
+		ESP8266_sendCommand("AT+CIPSTART=\"TCP\",\"192.168.0.105\",8080\r\n");
+		wait(10);
+		ESP8266_waitResponseEnd();
+		
+		if (START_MODE == AUTO) {
+			ESP8266_sendCommand("AT+CIPSEND=57\r\n");
+			wait(100);
+			ESP8266_waitResponseEnd();
+			
+			ESP8266_sendCommand("GET /HWLAB_IoT/SetInformation?ID=1&DATA=AUTO HTTP/1.0\r\n\r\n");
+			wait(100);
+		}
+		else {
+			ESP8266_sendCommand("AT+CIPSEND=59\r\n");
+			wait(100);
+			ESP8266_waitResponseEnd();
+			
+			ESP8266_sendCommand("GET /HWLAB_IoT/SetInformation?ID=1&DATA=MANUEL HTTP/1.0\r\n\r\n");
+			wait(100);
+		}
+	} 
+	
+	
 }

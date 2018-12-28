@@ -8,23 +8,6 @@ uint8_t esp8266ResponseCurrentIndex;
 char esp8266Buffer[ESP8266BufferSize];
 char esp8266Response[ESP8266BufferSize];
 
-void changeBaudRate(uint32_t rate) {
-	ESP8266_UART->LCR |= (1 << 7);
-	
-	//Write correct DLM, DLL and FDR values for 115200 baudrate
-	if (rate == 115200) {
-		ESP8266_UART->DLM = 0x00;
-		ESP8266_UART->DLL = 0x13;
-		ESP8266_UART->FDR = 0x05 << 0 | 0x07 << 4;
-	} else if (rate == 9600) {
-		ESP8266_UART->DLM = 0x01;
-		ESP8266_UART->DLL = 0x25;
-		ESP8266_UART->FDR = 0x01 << 0 | 0x03 << 4;
-	}
-
-	ESP8266_UART->LCR &= ~(1 << 7);
-}
-
 void ESP8266_Init() {
 	ESP8266_UART_TX_PIN |= 0x02;
 	ESP8266_UART_RX_PIN |= 0x02;
@@ -36,7 +19,13 @@ void ESP8266_Init() {
 						 |	0 << 2
 						 |	0 << 6;
 	
-	changeBaudRate(115200);
+	ESP8266_UART->LCR |= (1 << 7);
+	
+	ESP8266_UART->DLM = 0x00;
+	ESP8266_UART->DLL = 0x13;
+	ESP8266_UART->FDR = 0x05 << 0 | 0x07 << 4;
+	
+	ESP8266_UART->LCR &= ~(1 << 7);
 	
 	ESP8266_UART->LCR =	3 << 0
 							| 0 << 2
@@ -70,7 +59,19 @@ uint8_t ESP8266_waitResponseEnd() {
 			bufferIndex = esp8266ResponseStartIndex + esp8266ResponseCurrentIndex;
 			esp8266Response[esp8266ResponseCurrentIndex] = esp8266Buffer[bufferIndex];
 		}
-		if(strstr(esp8266Response, "OK")) {
+		if(strstr(esp8266Response, "CONNECTED")) {
+			return 6;
+		}
+		else if(strstr(esp8266Response, "#")) {
+			return 10;
+		}
+		else if(strstr(esp8266Response, "66")) {
+			return 13;
+		}
+		else if(strstr(esp8266Response, "*")) {
+			return 12;
+		}
+		else if(strstr(esp8266Response, "OK")) {
 			return 1;
 		}
 		else if(strstr(esp8266Response, "FAIL")) {
@@ -84,15 +85,6 @@ uint8_t ESP8266_waitResponseEnd() {
 		}
 		else if(strstr(esp8266Response, "ERROR")) {
 			return 5;
-		}
-		else if(strstr(esp8266Response, "CONNECTED")) {
-			return 6;
-		}
-		else if(strstr(esp8266Response, "#")) {
-			return 10;
-		}
-		else if(strstr(esp8266Response, "*")) {
-			return 12;
 		}
 	}
 	return 0;

@@ -25,4 +25,6 @@ typedef enum {
 
 void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state);
 void LED_Adjuster(LED_State state);
+
+void wifi_check(void);
 #endif
