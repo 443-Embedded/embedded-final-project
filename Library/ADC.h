@@ -5,6 +5,7 @@
 
 #include "SystemStructures.h"
 #include "main.h"
+#include "math.h"
 
 typedef struct {
   volatile	uint32_t CR;
@@ -40,7 +41,7 @@ typedef struct {
 #define ADC_TRIMPOT_MAX 0xFE8
 #define ADC_TRIMPOT_MIN 0x000
 
-#define LDR_WEIGHT 10
+#define LDR_WEIGHT 100
 
 #define ADC_BASE	0x40034000
 #define ADC	((ADC_TypeDef*) ADC_BASE)

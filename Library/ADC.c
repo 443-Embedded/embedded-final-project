@@ -31,7 +31,7 @@ void ADC_Init() {
 	//Turn on ADC.
 	PCONP |= (1 << 12);
 	
-	ADC->CR = 0x00200401;
+	ADC->CR = 0x0020FF01;
 	
 	ADC->INTEN |= (1 << 0 | 1 << 2 | 1 << 3);
 	
@@ -43,57 +43,94 @@ void ADC_Start() {
 	ADC->CR |= (1 << 24);
 }
 
-uint32_t ADC_TRIMPOT;
-uint32_t ADC_RIGHT_LDR;
-uint32_t ADC_LEFT_LDR;
-
-
+int32_t ADC_TRIMPOT;
+int32_t ADC_RIGHT_LDR;
+int32_t ADC_LEFT_LDR;
 
 // PID Part --- set these 3 coefficients
-uint32_t Kp = -1;   // Tahmini değer aralığı 200-1000
-uint32_t Ki = -1;   // max 100 gibi
-uint32_t Kd = -1;   // max 50 gibi
-uint32_t prev_error = 0;
-uint32_t total_error = 0;
+int32_t Kp = 800;   // Tahmini değer aralığı 200-1000
+int32_t Ki = 5;   // max 100 gibi
+int32_t Kd = 15;   // max 50 gibi
+int32_t prev_error = 0;
+int32_t total_error = 0;
 
 // Left_LDR - Right_LDR --> error 
 // Add this value to left motor and subtract from right motor
-uint32_t pid(uint32_t error) {
-	uint32_t combinedPIDValues = 0;
+int32_t pid(int32_t error) {
+	int32_t combinedPIDValues = 0;
 	// P 
 	combinedPIDValues += Kp * error;
 	
 	// I
-	total_error += Ki * error * 20; // 20ms beklediğimiz için
+	total_error = total_error * 3 / 4 + error * 10; // 10ms beklediğimiz için
 	combinedPIDValues += Ki * total_error;
 	
 	// D
-	combinedPIDValues +=(Kd * (error - prev_error)) / 20; // 20ms beklediğimiz için
+	combinedPIDValues += (Kd * (error - prev_error)) / 10; // 10ms beklediğimiz için
 	prev_error = error;
 	
-	return combinedPIDValues / 1000;
+	return combinedPIDValues / 0xFFF;
+}
+
+int32_t inc;
+int32_t leftSpeed;
+int32_t rightSpeed;
+
+void set_motor(uint32_t MOTOR_TYPE, int32_t speed) {
+	if(speed < 0) {
+		MOTOR_Direction(MOTOR_TYPE, BACKWARD);
+		speed = -speed;
+	}
+	else
+		MOTOR_Direction(MOTOR_TYPE, FORWARD);
+	if(speed > 100)
+		speed = 100;
+	PWM_MOTOR_Write(speed, MOTOR_TYPE);
 }
 
 void set_speed() {
 	ROBOT_SPEED = 100 * (ADC_TRIMPOT - ADC_TRIMPOT_MIN) / (ADC_TRIMPOT_MAX - ADC_TRIMPOT_MIN);
 	if(FORWARD_FLAG && goBack == 0) {
-		uint32_t leftSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_LEFT_LDR / ADC_MAX / 100;
-		uint32_t rightSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_RIGHT_LDR / ADC_MAX / 100;
-		uint32_t inc = ROBOT_SPEED - (leftSpeed + rightSpeed) / 2;
-		if(leftSpeed + inc > 100) {
-			rightSpeed += 100 - leftSpeed;
+		//leftSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_LEFT_LDR / ADC_MAX / 100;
+		//rightSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_RIGHT_LDR / ADC_MAX / 100;
+		//inc = pid((int)(pow(ADC_LEFT_LDR, 0.25) * 512 - (int)pow(ADC_RIGHT_LDR, 0.25) * 512));
+		inc = pid((int)(ADC_LEFT_LDR) - (int)(ADC_RIGHT_LDR) - 200);
+		rightSpeed = ROBOT_SPEED + inc;
+		leftSpeed = ROBOT_SPEED - inc;
+		
+		if(leftSpeed > 100) {
+			rightSpeed = rightSpeed * 100 / leftSpeed;
 			leftSpeed = 100;
+			if(rightSpeed < -100) {
+				leftSpeed = leftSpeed * 100 / -rightSpeed;
+				rightSpeed = -100;
+			}
 		}
-		else if(rightSpeed + inc > 100) {
-			leftSpeed += 100 - rightSpeed;
+		if(rightSpeed > 100) {
+			leftSpeed = leftSpeed * 100 / rightSpeed;
 			rightSpeed = 100;
+			if(leftSpeed < -100) {
+				rightSpeed = rightSpeed * 100 / -leftSpeed;
+				leftSpeed = -100;
+			}
 		}
-		else {
-			leftSpeed += inc;
-			rightSpeed += inc;
+		
+		if (rightSpeed - leftSpeed > 30 && !TURN_LEFT_FLAG) {
+			TURN_RIGHT_FLAG = BACKWARD_FLAG = 0;
+			TURN_LEFT_FLAG = 1;
+			LED_Adjuster(LEFT_BLINKER);	
+		} else if (leftSpeed - rightSpeed > 30 && !TURN_RIGHT_FLAG) {
+			TURN_LEFT_FLAG = BACKWARD_FLAG = 0;
+			TURN_RIGHT_FLAG = 1;
+			LED_Adjuster(RIGHT_BLINKER);
+		} else if (leftSpeed - rightSpeed <= 15 && rightSpeed - leftSpeed <= 15) {
+			TURN_RIGHT_FLAG = BACKWARD_FLAG = TURN_LEFT_FLAG = 0;
+			FORWARD_FLAG = 1;
+			LED_Adjuster(FORWARD_LED);
 		}
-		PWM_MOTOR_Write(rightSpeed, 0);	
- 		PWM_MOTOR_Write(leftSpeed, 1);
+		
+		set_motor(1, rightSpeed);
+ 		set_motor(0, leftSpeed);
 	}
 	else {
 		PWM_MOTOR_Write(ROBOT_SPEED, 0);

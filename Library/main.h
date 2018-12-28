@@ -12,6 +12,8 @@
 #include "Wait.h"
 #include "Parameters.h"
 #include "External.h"
+#include "ESP8266.h"
+#include "Serial.h"
 
 typedef enum {
 	STOP,	FORWARD, BACKWARD
@@ -23,4 +25,6 @@ typedef enum {
 
 void MOTOR_Direction(uint32_t MOTOR_TYPE, Motor_State state);
 void LED_Adjuster(LED_State state);
+
+void wifi_check(void);
 #endif

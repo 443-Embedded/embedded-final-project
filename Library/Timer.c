@@ -1,5 +1,7 @@
 #include "Timer.h"
 
+uint16_t count = 0;
+
 void Timer0_Init() {
 	//Change the mode to Timer Mode.
 	TIMER0->CTCR = 0x00;
@@ -43,6 +45,11 @@ void Timer0_Stop() {
 * Every 10 ms, this handler will be called.
 */
 void TIMER0_IRQHandler() {
+	count++;
+	if (COMM_TYPE == WIFI_COMM && count == 300) {
+		count = 0;
+		wifi_check();
+	}
 	ADC_Start();
 	
 	//Clear the interrupt flag for MAT channel 0 event

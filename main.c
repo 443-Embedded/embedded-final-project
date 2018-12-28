@@ -8,6 +8,21 @@ void init() {
 	
 	External_Init();
 	
+	if(COMM_TYPE == WIFI_COMM){
+		ESP8266_Init();
+		wait(300);
+
+		ESP8266_sendCommand("AT\r\n");
+		wait(3000);
+		ESP8266_waitResponseEnd();
+		
+		ESP8266_sendCommand("AT+CWJAP=\"HWLAB\",\"12345678\"\r\n");
+		wait(3000);
+		ESP8266_waitResponseEnd();
+	} else if(COMM_TYPE == UART_COMM){
+		Serial_Init();
+	}
+	
 	Timer0_Init();
 	Timer1_Init();
 	Timer2_Init();
@@ -17,6 +32,7 @@ void init() {
 	Timer0_Start();
 	TIMER2_Start();
 	TIMER3_Start();
+	
 }
 
 /*
@@ -91,16 +107,46 @@ void update() {
 	}
 }
 
+void wifi_check(){
+	ESP8266_sendCommand("AT+CIPSTART=\"TCP\",\"192.168.0.105\",8080\r\n");
+	wait(10);
+	ESP8266_waitResponseEnd();
+	
+	ESP8266_sendCommand("AT+CIPSEND=47\r\n");
+	wait(100);
+	ESP8266_waitResponseEnd();
+	
+	ESP8266_sendCommand("GET /HWLAB_IoT/GetInformation?ID=1 HTTP/1.0\r\n\r\n");
+	wait(100);
+	uint16_t status = ESP8266_waitResponseEnd();
+	if (status == 10 && START_MODE != AUTO) {
+		changeStartMode(AUTO);
+	} 
+	if (status == 12 && START_MODE != MANUAL) {
+		changeStartMode(MANUAL);
+	}
+	if (status == 13 && START_MODE == AUTO) {
+		TURN_LEFT_FLAG = TURN_RIGHT_FLAG = BACKWARD_FLAG = 0;
+		FORWARD_FLAG = 1;
+		MOTOR_Direction(0, FORWARD);
+		MOTOR_Direction(1, FORWARD);
+		LED_Adjuster(FORWARD_LED);
+	}
+}
+
 int main() {
 	init();		// Initializes everything
 	wait(1000);	// Wait 1 second because we have encountered our board starts as left joystick pressed for 0.4 millisecond.
 	while(1) {	// Event loop
-		ADC_Start();
 		switch(START_MODE) {
 			case AUTO:
-				MOTOR_Direction(1, STOP);
-				MOTOR_Direction(0, STOP);
-				LED_Adjuster(STOP_LED);
+				if (Joystick_Up_Pressed()) {
+					TURN_LEFT_FLAG = TURN_RIGHT_FLAG = BACKWARD_FLAG = 0;
+					FORWARD_FLAG = 1;
+					MOTOR_Direction(0, FORWARD);
+					MOTOR_Direction(1, FORWARD);
+					LED_Adjuster(FORWARD_LED);
+				}
 				break;
 			case MANUAL:
 				update();
