@@ -50,8 +50,8 @@ int32_t ADC_LEFT_LDR;
 
 
 // PID Part --- set these 3 coefficients
-int32_t Kp = 800;   // Tahmini değer aralığı 200-1000
-int32_t Ki = 1;   // max 100 gibi
+int32_t Kp = 1200;   // Tahmini değer aralığı 200-1000
+int32_t Ki = 10;   // max 100 gibi
 int32_t Kd = 15;   // max 50 gibi
 int32_t prev_error = 0;
 int32_t total_error = 0;
@@ -64,7 +64,7 @@ int32_t pid(int32_t error) {
 	combinedPIDValues += Kp * error;
 	
 	// I
-	total_error = total_error * 9 / 10 + error * 10; // 10ms beklediğimiz için
+	total_error = total_error * 3 / 4 + error * 10; // 10ms beklediğimiz için
 	combinedPIDValues += Ki * total_error;
 	
 	// D
@@ -96,7 +96,7 @@ void set_speed() {
 		//leftSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_LEFT_LDR / ADC_MAX / 100;
 		//rightSpeed = ROBOT_SPEED - ROBOT_SPEED * LDR_WEIGHT * ADC_RIGHT_LDR / ADC_MAX / 100;
 		//inc = pid((int)(pow(ADC_LEFT_LDR, 0.25) * 512 - (int)pow(ADC_RIGHT_LDR, 0.25) * 512));
-		inc = pid((int)(ADC_LEFT_LDR) - (int)(ADC_RIGHT_LDR));
+		inc = pid((int)(ADC_LEFT_LDR) - (int)(ADC_RIGHT_LDR) - 200);
 		rightSpeed = ROBOT_SPEED + inc;
 		leftSpeed = ROBOT_SPEED - inc;
 		

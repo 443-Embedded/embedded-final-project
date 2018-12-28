@@ -85,6 +85,9 @@ uint8_t ESP8266_waitResponseEnd() {
 		else if(strstr(esp8266Response, "ERROR")) {
 			return 5;
 		}
+		else if(strstr(esp8266Response, "CONNECTED")) {
+			return 6;
+		}
 	}
 	return 0;
 }

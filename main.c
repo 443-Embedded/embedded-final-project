@@ -18,25 +18,39 @@ void init() {
 	TIMER2_Start();
 	TIMER3_Start();
 	
-	//ESP8266_Init();
+	if(0){
+		ESP8266_Init();
 	
-	//wait(100);
+		wait(200);
+		
+		//ESP8266_sendCommand("AT+IPR=9600\r\n");
+		//wait(2000);
+		//changeBaudRate(9600);
+		ESP8266_sendCommand("AT\r\n");
+		
+		wait(2000);
+		
+		//ESP8266_sendCommand("AT\r\n");
+		ESP8266_sendCommand("AT+CWJAP=\"HWLAB\",\"12345678\"\r\n");
+		wait(3000);
+		ESP8266_waitResponseEnd();
+		
+		ESP8266_sendCommand("AT+CIPSTART=\"TCP\",\"192.168.0.103\",8080\r\n");
+		wait(3000);
+		ESP8266_waitResponseEnd();
+		
+		ESP8266_sendCommand("AT+CIPSEND=42\r\n");
+		wait(10000);
+		ESP8266_waitResponseEnd();
+		
+		ESP8266_sendCommand("GET /HWLAB_IoT/GetInformation HTTP/1.0\r\n\r\n");
+		wait(10000);
+		ESP8266_waitResponseEnd();
+		
+		//wait(100);
+		//ESP8266_waitResponseEnd();
+	}
 	
-	//ESP8266_sendCommand("AT+IPR=9600\r\n");
-	//wait(2000);
-	//changeBaudRate(9600);
-	//ESP8266_sendCommand("AT+RST\r\n");
-	
-	//wait(2000);
-	
-	//ESP8266_sendCommand("AT\r\n");
-	//ESP8266_sendCommand("AT+CWJAP =\"HWLAB\",\"12345678\"\r\n");
-	//wait(3000);
-	//ESP8266_waitResponseEnd();
-	
-	
-	//wait(100);
-	//ESP8266_waitResponseEnd();
 }
 
 /*
