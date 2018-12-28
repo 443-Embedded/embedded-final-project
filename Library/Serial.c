@@ -53,12 +53,12 @@ void UART0_IRQHandler() {
 	Serial_WriteData(currentChar);
 	if (currentChar == '*') {
 		changeStartMode(MANUAL);
-		Serial_Write("Mode is MANUAL!");
+		Serial_Write("Mode is MANUAL!\r\n");
 	}
 	
 	if (currentChar == '#') {
 		changeStartMode(AUTO);
-		Serial_Write("Mode is AUTO!");
+		Serial_Write("Mode is AUTO!\r\n");
 	}
 	
 	if (START_MODE == AUTO && !FORWARD_FLAG && prevChar == '6' && currentChar == '6') {
@@ -67,7 +67,7 @@ void UART0_IRQHandler() {
 		MOTOR_Direction(0, FORWARD);
 		MOTOR_Direction(1, FORWARD);
 		LED_Adjuster(FORWARD_LED);
-		Serial_Write("Start!");
+		Serial_Write("Start!\r\n");
 	}
 }
 
