@@ -47,6 +47,7 @@ void Timer0_Stop() {
 */
 void TIMER0_IRQHandler() {
 	count++;
+	// call wifi check every 3 seconds
 	if (COMM_TYPE == WIFI_COMM && count == 300) {
 		count = 0;
 		wifi_check();
