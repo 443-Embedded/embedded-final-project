@@ -7,17 +7,18 @@ volatile uint32_t TURN_LEFT_FLAG = 0, TURN_RIGHT_FLAG = 0, FORWARD_FLAG = 0, BAC
 uint32_t ROBOT_SPEED = 0;
 const uint32_t HOLE_NUMBER_FOR_90_DEGREE = 6;
 
-const uint32_t OBSTACLE_DISTANCE = 15;
-const uint32_t OBSTACLE_ESCAPE_DISTANCE = 30;
+const uint32_t OBSTACLE_DISTANCE = 15;	// Maximum distance that car can get close to an object in the front line.
+const uint32_t OBSTACLE_ESCAPE_DISTANCE = 30;  // Minimum distance until car gets safe from object.
 
 const uint32_t MOTOR_PINS[2][2] = {{9, 8}, {1, 0}};
 
 const uint32_t LED_PINS[4] = {5, 6, 7, 11};
 
-uint8_t START_MODE = MANUAL;
+uint8_t START_MODE = MANUAL;	// Initial mode is manual
 
 const uint8_t COMM_TYPE = BASIC;
 
+// TODO
 void changeStartMode (START_State state) {
 	START_MODE = state;
 	MOTOR_Direction(1, STOP);
