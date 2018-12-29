@@ -2,6 +2,7 @@
 
 uint16_t count = 0;
 
+// Initialized for ADC and Wifi
 void Timer0_Init() {
 	//Change the mode to Timer Mode.
 	TIMER0->CTCR = 0x00;
@@ -50,12 +51,13 @@ void TIMER0_IRQHandler() {
 		count = 0;
 		wifi_check();
 	}
-	ADC_Start();
+	ADC_Start();	// starts ADC conversion at each 10ms
 	
 	//Clear the interrupt flag for MAT channel 0 event
 	TIMER0->IR = (1 << 0);
 }
 
+// Initialized for LED blinking
 void Timer1_Init() {
 	//Change the mode of Timer1 to Timer Mode.
 	TIMER1->CTCR = 0x00;
@@ -124,6 +126,7 @@ void TIMER1_IRQHandler() {
 	TIMER1->IR = (1 << 0);
 }
 
+// Initialized for speed sensors and Trigger for Ultrasonic sensors
 void Timer2_Init() {
 	//Enable Timer2
 	PCONP |= (1 << 22);
@@ -195,6 +198,7 @@ uint8_t ultrasonicSensorEdgeCount = 0;
 * total rotation then stops the wheel, if both completes turns off LEDs.
 */
 void TIMER2_IRQHandler() { 
+	// Trigger sends for 10 microsecond and waits 60ms for echo.
 	if ((TIMER2->IR & (1 << 1))) {
 		if(TIMER2->MR1 == 10) {
 			//Change MR1 Register Value for Suggested Waiting
@@ -218,12 +222,15 @@ void TIMER2_IRQHandler() {
 	}
 	tacho[0] += (TIMER2->IR >> 4) & 1;
 	tacho[1] += (TIMER2->IR >> 5) & 1;
-	TIMER2->IR = 3 << 4;
+	TIMER2->IR = 3 << 4;	// Clears Interrupt register for TIMER2.
 }
 
+// Initialization for Echo
 void Timer3_Init() {
+	//Enables Timer3
 	PCONP |= (1 << 23);
 	
+	//Set the function of P0_24 to T3_CAP1
 	IOCON_ECHO |= 3;
 	
 	//Change the mode of Timer3 to Timer Mode.
@@ -245,6 +252,7 @@ void Timer3_Init() {
 	NVIC_EnableIRQ(TIMER3_IRQn);
 }
 
+// Starts ultrasonic sensor
 void TIMER3_Start() {
 	//Enable reset on counters
 	TIMER3->TCR |= (1 << 1);
@@ -263,13 +271,14 @@ uint32_t ultrasonicSensorDistance = 0;
 uint8_t goBack = 0;
 
 void TIMER3_IRQHandler() {
-	if(ultrasonicSensorEdgeCount == 0) {
+	if(ultrasonicSensorEdgeCount == 0) { // First captures rising edge and waits for falling edge to obtain distance
 		//Store the rising time into ultrasonicSensorRisingTime variable
 		ultrasonicSensorRisingTime = TIMER3->CR1;
 	}
 	else if(ultrasonicSensorEdgeCount == 1){
-		ultrasonicSensorDistance = (TIMER3->CR1 - ultrasonicSensorRisingTime) / 58;
+		ultrasonicSensorDistance = (TIMER3->CR1 - ultrasonicSensorRisingTime) / 58; // convert read data to cm
 		
+		// If there exist an object closer than OBSTACLE_DISTANCE in the front wiev, motor goes backward.
 		if (ultrasonicSensorDistance <= OBSTACLE_DISTANCE && FORWARD_FLAG) {
 			LED_Adjuster(BACKWARD_LED);
 			MOTOR_Direction(0, BACKWARD);
@@ -283,6 +292,6 @@ void TIMER3_IRQHandler() {
 		}
 	}
 	ultrasonicSensorEdgeCount++;
-	TIMER3->IR = 1 << 5;
+	TIMER3->IR = 1 << 5;	// Clears IR Register
 }
 
