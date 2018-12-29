@@ -8,6 +8,9 @@ uint8_t esp8266ResponseCurrentIndex;
 char esp8266Buffer[ESP8266BufferSize];
 char esp8266Response[ESP8266BufferSize];
 
+/*
+* Initializes UART3 for Wifi. Most of the part of this function is given.
+*/
 void ESP8266_Init() {
 	ESP8266_UART_TX_PIN |= 0x02;
 	ESP8266_UART_RX_PIN |= 0x02;
@@ -40,6 +43,9 @@ void ESP8266_Init() {
 	NVIC_EnableIRQ(UART3_IRQn);
 }
 
+/*
+* Sends command to Wifi
+*/
 void ESP8266_sendCommand(char* command) {
 	uint16_t index;
 	for(index = 0; index < ESP8266BufferSize; index++) {
@@ -50,6 +56,9 @@ void ESP8266_sendCommand(char* command) {
 	ESP8266_Write(command);
 }
 
+/*
+* Waits until response come, then returns according to response.
+*/
 uint8_t ESP8266_waitResponseEnd() {
 	uint8_t responseEndIndex;
 	uint8_t bufferIndex;
@@ -90,6 +99,9 @@ uint8_t ESP8266_waitResponseEnd() {
 	return 0;
 }
 
+/*
+* Reads response from Wifi and returns the message as char array.
+*/
 char* ESP8266_readResponse() {
 	char data;
 	uint16_t index;
