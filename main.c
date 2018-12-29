@@ -1,16 +1,17 @@
 #include "Library/main.h"
 
-// Initialize GPIO, PWM, LEDs, and Timers.
+// Initialize GPIO, PWM, LEDs, ADC's and Timers.
 void init() {
 	GPIO_Init();
 	PWM_Init();
 	LED_Init();
 	
-	External_Init();
+	External_Init();  // Initialization for push button
 	
+	// Uses waits while using wifi, otherwise send and waitresponse functions don't work properly
 	if(COMM_TYPE == WIFI_COMM){
 		ESP8266_Init();
-		wait(300);
+		wait(300); 
 
 		ESP8266_sendCommand("AT\r\n");
 		wait(3000);
@@ -107,6 +108,7 @@ void update() {
 	}
 }
 
+// Sets up connection with access point
 void wifi_check(){
 	ESP8266_sendCommand("AT+CIPSTART=\"TCP\",\"192.168.0.105\",8080\r\n");
 	wait(10);
@@ -148,7 +150,7 @@ int main() {
 					LED_Adjuster(FORWARD_LED);
 				}
 				break;
-			case MANUAL:
+			case MANUAL:	// Activates Joysticks
 				update();
 				break;
 			default:
