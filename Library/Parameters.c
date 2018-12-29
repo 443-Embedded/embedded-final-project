@@ -18,7 +18,7 @@ uint8_t START_MODE = MANUAL;	// Initial mode is manual
 
 const uint8_t COMM_TYPE = BASIC;
 
-// TODO
+// Change Start method via Push Button, UART signal or Wifi comminication
 void changeStartMode (START_State state) {
 	START_MODE = state;
 	MOTOR_Direction(1, STOP);
