@@ -7,6 +7,7 @@ char serialReceivedCharacter = 0;
 char prevChar = 0;
 char currentChar = 0;
 
+// Initializes UART0 for communication.
 void Serial_Init() {
 	//Change the function of TX and RX pins for UART.
 	Serial_UART_TX_PIN |= 1;
@@ -47,6 +48,9 @@ void Serial_Init() {
 	NVIC_SetPriority(UART0_IRQn, 5);
 }
 
+/*
+* Changes states of all LEDs and in the case of turning left or right starts the corresponding timers.
+*/
 void UART0_IRQHandler() {	
 	prevChar = currentChar;
 	currentChar = Serial_ReadData();
@@ -71,15 +75,24 @@ void UART0_IRQHandler() {
 	}
 }
 
+/*
+* Reads Received Buffer from UART
+*/
 char Serial_ReadData() {
 	return Serial_UART->RBR;
 }
 
+/*
+* Waits until Transmitter Holding Register contains valid data and writes data.
+*/
 void Serial_WriteData(char data) {
 	while (!(Serial_UART->LSR & 0x20));
 	Serial_UART->THR = data;
 }
 
+/*
+* Writes chars in order.
+*/
 void Serial_Write(char* data) {
 	while(*data)  {
 		Serial_WriteData(*data++);
